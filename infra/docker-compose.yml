@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: valence
+      POSTGRES_PASSWORD: valence
+      POSTGRES_DB: valence
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U valence -d valence"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    image: amacneil/dbmate:2
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/db/migrations
+    environment:
+      DATABASE_URL: postgres://valence:valence@postgres:5432/valence?sslmode=disable
+    command: ["up"]
+
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://valence:valence@postgres:5432/valence?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:

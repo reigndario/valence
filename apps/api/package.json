@@ -1,0 +1,26 @@
+{
+  "name": "@valence/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo \"lint: not configured yet — eslint is not installed\" && exit 1",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "fastify": "^5.1.0",
+    "ioredis": "^5.4.1",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/pg": "^8.11.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.5"
+  }
+}
