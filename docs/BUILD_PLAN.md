@@ -4,9 +4,9 @@
 
 Master phase-by-phase status tracker. The full description of each phase — what it delivers,
 its acceptance test — lives in [`CLAUDE.md`](../CLAUDE.md#phase-plan) and is not duplicated
-here beyond a one-line summary. Full task-level checklists for every phase (0–9), with stable
+here beyond a one-line summary. Full task-level checklists for every phase (0–11), with stable
 `P{phase}-{seq}` item IDs for cross-referencing in commits/PRs, live in
-[`docs/SCAFFOLDING.md`](./SCAFFOLDING.md) (schema v2.0.0 — see its own versioning standard).
+[`docs/SCAFFOLDING.md`](./SCAFFOLDING.md) (schema v3.0.0 — see its own versioning standard).
 This file exists to answer "what's done, what's next, what's blocked" at a glance. Per the
 working agreement: **one phase worked at a time — later phases' checklists exist and are
 versioned from day one, but no code is written against a future phase before the current one's
@@ -18,14 +18,23 @@ acceptance test passes.**
 |---|---|---|---|
 | 0 | Skeleton | ✅ Done — 2026-07-28 | `docker compose up`, `make demo` green |
 | 1 | Intake and sandbox | ✅ Done — 2026-07-28 | Point it at a real public Foundry repo, get a reproducible build and a stored artifact set |
-| 2 | Analysis battery v1 | ▶️ Next | Run on a repo with known issues produces a deduped finding set; re-running with suppressions applied is quieter |
-| 3 | Triage workbench | ⏸ Not started | Triage 100 raw findings down to a working set in under an hour |
+| 2 | Marketing funnel UI v1 | ▶️ Next | Public trial flow on a real repo gets a no-login, CTA'd report URL; 100 synthetic findings triaged in under an hour |
+| 3 | Analysis battery v1 | ⏸ Not started | Run on a repo with known issues produces a deduped finding set; re-running with suppressions applied is quieter |
 | 4 | Report generation | ⏸ Not started | Produce a report on a public repo defensible enough to send a paying client |
-| 5 | Client portal and remediation loop | ⏸ Not started | Re-run against a fix commit, diff findings, verify each claimed fix, issue a delta report |
-| 6 | Property testing and invariants | ⏸ Not started | Extract invariants for a real protocol, run them, report which hold under fuzzing |
-| 7 | LLM review pipeline | ⏸ Not started | On a repo with a known historical exploit, the pipeline proposes it and the gate promotes it on a failing test |
-| 8 | CI and continuous mode | ⏸ Not started | GitHub App posts checks per commit, gated against last accepted baseline |
-| 9 | Commercial | ⏸ Not started | Multi-tenant orgs, per-engagement pricing/quotas, Stripe, RBAC, access logging |
+| 5 | Warden v1 | ⏸ Not started | Correct ERC20 proves; broken `transferFrom` returns `VIOLATED` with a correct call trace; unbounded loop returns `UNKNOWN` with a stated reason |
+| 6 | Scout v1 | ⏸ Not started | Point it at a real small protocol with no spec — produces a working rule set plus a bug-hunting finding, retries an `UNKNOWN` before surfacing it |
+| 7 | Foil v1 | ⏸ Not started | A vacuous spec is flagged by a surviving mutant that names the exact hole |
+| 8 | Client portal and remediation loop | ⏸ Not started | Re-run against a fix commit, diff findings, verify each claimed fix, issue a delta report |
+| 9 | Property testing and invariants | ⏸ Not started | Extract invariants for a real protocol, run them, report which hold under fuzzing |
+| 10 | CI and continuous mode | ⏸ Not started | GitHub App posts checks per commit, gated against last accepted baseline, for findings and Warden/Scout rules alike |
+| 11 | Commercial | ⏸ Not started | Multi-tenant orgs, per-engagement pricing/quotas, Stripe, RBAC, access logging |
+
+Warden (formal verification), Scout (an AI agent), and Foil (mutation testing) are now the
+priority build target inside the existing `apps/workbench`/`packages/*`/`workers/*` structure —
+see `CLAUDE.md` for the full product framing. Phase 2 is deliberately a UI phase, pulled ahead
+of further backend depth: the workbench shell, the full triage-queue interactions, and a
+public, permanent, shareable report URL that doubles as the marketing funnel for non-client
+runs.
 
 ## Parallel workstream: apps/marketing
 
@@ -92,22 +101,35 @@ for the full reasoning:
   superseded same day. Tradeoff: no presigned-URL downloads; Phase 5's client portal proxies
   file downloads through `apps/api` instead.
 - **Phase-checklist scaffolding policy** (2026-07-28): `CLAUDE.md`'s working agreement amended
-  — full task-level checklists for all phases (0–9) are now drafted up front in
+  — full task-level checklists for all phases (0–9, later 0–11) are now drafted up front in
   `docs/SCAFFOLDING.md` under its own semver scheme, instead of only the active phase having a
   checklist. Supersedes the original "no speculative scaffolding for later phases" rule for
   planning purposes specifically; execution is still strictly one phase at a time.
+- **Product-direction update / phase-plan restructuring** (2026-07-28): Warden, Scout, and Foil
+  added as priority phases inside the existing architecture (no app/package rename); a new
+  Phase 2 "marketing funnel UI v1" inserted ahead of the analysis battery; phases renumbered
+  2–9 → 2–11; old Phase 7 (LLM review pipeline) absorbed into new Phase 6 (Scout). Full
+  reasoning and the item-ID remapping table are in `docs/SCAFFOLDING.md`'s v3.0.0 revision-
+  history entry.
 
 ## Pending decisions (blocking future phases)
 
-Carried from CLAUDE.md's "Things to raise with Jeff" — listed here against the phase each one
+Carried from CLAUDE.md's "Things to raise with Sophie" — listed here against the phase each one
 blocks, so the right one gets raised at the right time instead of all at once:
 
+- **The Warden engine decision** (orchestrate open-source engines vs. fork Certora's Prover
+  vs. build a verification-condition generator + solver portfolio) — blocks Phase 5, the
+  single biggest architecture call in the new product line.
+- **Whether the self-serve trial flow is public-by-default for non-client runs** — blocks
+  Phase 2's shareable-report opt-in mechanism.
 - **Whether first paying engagements run by hand while the workbench is built** — affects
   phase ordering. Didn't block Phase 1's code and is still open; worth resolving before Phase
   2/3 prioritization decisions get made by default inertia.
-- **Severity model** (Code4rena/Sherlock impact×likelihood matrix vs. custom) — blocks Phase 2
+- **Severity model** (Code4rena/Sherlock impact×likelihood matrix vs. custom) — blocks Phase 3
   (the canonical finding model needs a severity field shape).
 - **Whether to run client code through a hosted LLM, and under what provider terms** — blocks
-  Phase 7, but the confidentiality implications should be settled well before then.
+  Phase 6 (Scout), but the confidentiality implications should be settled well before then.
+- **Whether Scout's model calls need a self-hostable path for enterprise clients** — sharper
+  version of the question above, matters specifically for the Enterprise pitch.
 - **Whether Valence sells to audit firms as a tooling layer** — affects what Phase 4's report
   is optimized for; worth raising before report templates are locked in.

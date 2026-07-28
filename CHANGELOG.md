@@ -25,6 +25,16 @@ All notable changes to this project are documented here. Format follows
 
 ### Changed
 
+- Product direction: `CLAUDE.md` now prioritizes Warden (formal verification), Scout (an AI
+  agent that infers intent and writes verification rules for it), and Foil (mutation testing)
+  as the automated engine layer inside the existing `apps/workbench` architecture — no
+  app/package rename, same three-product shape as Certora's Prover/AutoProver/Gambit lineup.
+  The phase plan is restructured and renumbered (2-9 → 2-11): a new Phase 2 ("marketing funnel
+  UI v1") is pulled ahead of the analysis battery, since the UI now doubles as a shareable,
+  permanent-report-URL funnel for non-confidential runs, not just an internal tool. Warden
+  lands at Phase 5, Scout at Phase 6 (absorbing the former standalone "LLM review pipeline"),
+  Foil at Phase 7. `docs/SCAFFOLDING.md` bumped to schema v3.0.0 with the full renumbered
+  checklists and an item-ID remapping table; `docs/BUILD_PLAN.md` updated to match.
 - Phase-checklist scaffolding policy: `CLAUDE.md`'s working agreement now calls for full
   task-level checklists across all phases (0-9) up front, drafted in
   [`docs/SCAFFOLDING.md`](./docs/SCAFFOLDING.md) (bumped to its own schema v2.0.0, with a
