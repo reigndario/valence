@@ -17,7 +17,12 @@ Python, TypeScript. Assume crypto and DeFi fluency.
 ## Working agreement
 
 - Read this file fully before writing code.
-- One phase at a time. No speculative scaffolding for later phases.
+- Full task-level checklists exist for every phase (0–9) from day one, versioned in
+  `docs/SCAFFOLDING.md` under its own semver scheme — the roadmap is never invisible or
+  undocumented. Execution still proceeds one phase at a time: only the active phase's
+  checklist gets worked, and no code is written against a future phase before its predecessor's
+  acceptance test passes. Drafting a checklist ahead of time is planning, not scaffolding; the
+  rule this replaces (2026-07-28) was aimed at the latter.
 - Before any decision that is expensive to reverse (schema shape, finding model, sandbox
   strategy, LLM review architecture), stop, give Jeff two or three options with tradeoffs,
   and wait.

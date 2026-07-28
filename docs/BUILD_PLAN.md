@@ -4,9 +4,13 @@
 
 Master phase-by-phase status tracker. The full description of each phase — what it delivers,
 its acceptance test — lives in [`CLAUDE.md`](../CLAUDE.md#phase-plan) and is not duplicated
-here beyond a one-line summary. This file exists to answer "what's done, what's next, what's
-blocked" at a glance. Per the working agreement: **one phase active at a time, no speculative
-work on a later phase before the current one's acceptance test passes.**
+here beyond a one-line summary. Full task-level checklists for every phase (0–9), with stable
+`P{phase}-{seq}` item IDs for cross-referencing in commits/PRs, live in
+[`docs/SCAFFOLDING.md`](./SCAFFOLDING.md) (schema v2.0.0 — see its own versioning standard).
+This file exists to answer "what's done, what's next, what's blocked" at a glance. Per the
+working agreement: **one phase worked at a time — later phases' checklists exist and are
+versioned from day one, but no code is written against a future phase before the current one's
+acceptance test passes.**
 
 ## Status
 
@@ -87,6 +91,11 @@ for the full reasoning:
   (plain block storage on `workers/orchestrator`), not Cloudflare R2 as originally decided —
   superseded same day. Tradeoff: no presigned-URL downloads; Phase 5's client portal proxies
   file downloads through `apps/api` instead.
+- **Phase-checklist scaffolding policy** (2026-07-28): `CLAUDE.md`'s working agreement amended
+  — full task-level checklists for all phases (0–9) are now drafted up front in
+  `docs/SCAFFOLDING.md` under its own semver scheme, instead of only the active phase having a
+  checklist. Supersedes the original "no speculative scaffolding for later phases" rule for
+  planning purposes specifically; execution is still strictly one phase at a time.
 
 ## Pending decisions (blocking future phases)
 
