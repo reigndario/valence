@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: valence
+          POSTGRES_PASSWORD: valence
+          POSTGRES_DB: valence
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U valence -d valence"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+
+    env:
+      DATABASE_URL: postgres://valence:valence@localhost:5432/valence?sslmode=disable
+      REDIS_URL: redis://localhost:6379
+      PORT: 8080
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install dbmate
+        run: |
+          sudo curl -fsSL -o /usr/local/bin/dbmate \
+            https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+          sudo chmod +x /usr/local/bin/dbmate
+
+      - name: Run migrations
+        run: dbmate --migrations-dir infra/migrations up
+
+      - run: pnpm -r typecheck
+
+      - run: pnpm -r build
+
+      - name: Run tests
+        run: pnpm --filter @valence/api test
+
+      - name: Boot api and smoke-test /health
+        run: |
+          pnpm --filter @valence/api start &
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/health > /dev/null; then
+              echo "api healthy"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "api did not become healthy in time"
+          exit 1
