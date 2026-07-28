@@ -27,7 +27,13 @@ Python, TypeScript. Assume crypto and DeFi fluency.
 
 ## Decisions made (do not re-litigate without cause)
 
-**Hosting split:** `apps/workbench` and `apps/portal` (Next.js 15) deploy to **Vercel**.
+**Hosting split:** `apps/workbench` and `apps/portal` (Next.js 15) deploy to **Vercel**. Note:
+Vercel Authentication (Deployment Protection) is currently **disabled** on the `valence`
+Vercel project, by Jeff's explicit choice, for convenience while there's no application-level
+auth yet and nothing sensitive deployed — this makes every deployment, including previews,
+publicly reachable with no login. Re-enable (Standard Protection, or a custom production
+domain if the goal is a public marketing surface) before any real engagement data ever renders
+in `apps/workbench`, per the client confidentiality constraint below.
 `apps/api`, `workers/orchestrator`, `workers/analysis`, `workers/review`, Postgres, and Redis
 all live on **Railway**, on a private network together. Reasoning: the API and workers are
 long-running processes (SSE streaming, queue consumers, container provisioning for sandboxed
@@ -47,6 +53,16 @@ second-class citizen.
 **Local dev:** Docker Desktop + `docker-compose` with Postgres and Redis. This is identical
 regardless of the Railway/Vercel hosting split above — Phase 0's `make demo` runs entirely
 local.
+
+**Sandbox strategy (Phase 1):** hardened Docker (runc), not gVisor or Firecracker, for now.
+Read-only rootfs, tmpfs workspace, dropped capabilities, seccomp, no-new-privileges, network
+egress cut after dependency fetch, memory/CPU caps, hard wall-clock kill — all deployable on
+Railway with no new infrastructure. The residual risk is a host-kernel exploit via container
+escape; that's an explicit, revisit-before-launch tradeoff, not a permanent one. Reassess
+(gVisor first, since it's a drop-in OCI runtime built for exactly this — "run untrusted code
+as containers" — Firecracker or a managed sandbox provider only if gVisor proves insufficient
+or Railway can't run it) before the first paying engagement runs a genuinely adversarial repo
+through it.
 
 ## What a pre-audit actually delivers
 

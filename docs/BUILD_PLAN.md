@@ -44,15 +44,15 @@ for the full reasoning:
 - **Postgres access layer** (2026-07-28): plain SQL migrations (`infra/migrations/`, run via
   `dbmate`) as schema source of truth. TS queries via Kysely, Python via SQLAlchemy
   Core/psycopg. No ORM owns the schema.
+- **Sandbox strategy** (2026-07-28): hardened Docker (runc) for Phase 1, not gVisor or
+  Firecracker. Ships on Railway with no new infrastructure; explicitly revisit (gVisor first)
+  before the first paying engagement runs an adversarial repo through it.
 
 ## Pending decisions (blocking future phases)
 
 Carried from CLAUDE.md's "Things to raise with Jeff" — listed here against the phase each one
 blocks, so the right one gets raised at the right time instead of all at once:
 
-- **Sandbox strategy** (Docker vs. gVisor vs. Firecracker) — blocks Phase 1. Must be resolved
-  before sandboxed builds are implemented, since it's the security boundary for untrusted
-  client code.
 - **Whether first paying engagements run by hand while the workbench is built** — affects
   phase ordering; should be resolved before or during Phase 1.
 - **Severity model** (Code4rena/Sherlock impact×likelihood matrix vs. custom) — blocks Phase 2

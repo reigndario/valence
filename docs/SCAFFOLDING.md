@@ -36,14 +36,16 @@ not inferred from code.
 | Migrations | ✅ Done | `dbmate`, one bootstrap migration (`pgcrypto` extension) — no product tables yet, by design |
 | `apps/api` health path | ✅ Done | `GET /health` checks live Postgres + Redis connectivity, not just process liveness |
 | `apps/workbench` | 🔧 Partial | One page that server-fetches `apps/api`'s `/health` and renders it — proves the split works, no product UI yet |
-| CI | ✅ Done | GitHub Actions: install, typecheck, build, migrate, test, smoke-test `/health` — written and passing locally against the same steps, not yet run against a pushed GitHub repo |
+| CI | ✅ Done | GitHub Actions, confirmed green on a real run against `reigndario/valence` (fixed a `pnpm/action-setup` version conflict along the way) |
+| Lint | ❌ Missing | `eslint`/`next lint` were never wired up in Phase 0; both scripts now fail loudly and honestly rather than silently no-op |
 | Tests | 🔧 Partial | One integration test (`apps/api/src/health.test.ts`) against a real DB/Redis; no test infra yet for Python workers (don't exist yet) |
-| Git repository | ❌ Missing | Directory is not yet a git repo — nothing committed |
+| Git repository | ✅ Done | `github.com/reigndario/valence`, Phase 0 merged to `main` via PR #1 |
+| Vercel deployment | 🔧 Partial | `apps/workbench` project created; Deployment Protection currently disabled per Jeff's call (see `CLAUDE.md` note) |
 | `apps/portal` | ❌ Missing | Phase 5 |
 | `apps/api` product routes | ❌ Missing | Auth, orgs, engagements, findings, runs, SSE log streaming — Phase 1+ |
 | `packages/findings`, `packages/report`, `packages/sdk`, `packages/cli` | ❌ Missing | Phase 1 (`cli`), Phase 2 (`findings`), Phase 4 (`report`) |
 | `workers/orchestrator`, `workers/analysis`, `workers/review` | ❌ Missing | Phase 1, Phase 2, Phase 7 respectively |
-| Sandboxed build execution | ❌ Missing | Phase 1 — security boundary for untrusted client repos, strategy not yet decided |
+| Sandboxed build execution | ❌ Missing | Phase 1 — strategy decided (hardened Docker), not yet built |
 | `corpus/` | ❌ Missing | Phase 7 |
 | Deployment config (Vercel/Railway) | ❌ Missing | Hosting split decided (see `CLAUDE.md`) but no actual Vercel/Railway project wired up yet |
 
@@ -89,8 +91,10 @@ streamed logs, artifact persistence.
 - [ ] Build engagement intake: API route to create an engagement record
 - [ ] Stand up `workers/orchestrator` (TS) as a BullMQ queue consumer skeleton
 - [ ] Implement pinned-commit clone into an isolated workspace (tmpfs, read-only root)
-- [ ] Resolve the solc build matrix and run `forge build` per version, checked against the
-      chosen sandbox strategy (see decision below)
+- [ ] Resolve the solc build matrix and run `forge build` per version, inside a hardened
+      Docker container (runc) — see decision below
+- [ ] Harden the build container: read-only rootfs, tmpfs workspace, dropped capabilities,
+      seccomp profile, `no-new-privileges`
 - [ ] Enforce no network egress after dependency fetch, memory/CPU caps, hard wall-clock kill
 - [ ] Add a determinism check: build twice, diff artifacts
 - [ ] Stream build logs from the sandbox back through SSE on `apps/api`
@@ -100,11 +104,10 @@ streamed logs, artifact persistence.
       build plus a stored artifact set (this is the phase's acceptance test — automate it)
 - [ ] Update `docs/BUILD_PLAN.md` status table and this file when the acceptance test passes
 
-> **Decision required:** Sandbox strategy — Docker vs. gVisor vs. Firecracker. This is the
-> security boundary for arbitrary, untrusted client repos and is expensive to reverse once
-> `workers/orchestrator` is built against one model. Per the working agreement, this needs
-> options-with-tradeoffs presented before any sandbox code is written — do not default to
-> plain Docker containers without raising this first.
+> **Decided (2026-07-28):** Sandbox strategy is hardened Docker (runc), not gVisor or
+> Firecracker, for Phase 1 — ships on Railway with no new infrastructure. Explicit tradeoff:
+> revisit (gVisor first) before the first paying engagement runs an adversarial repo through
+> it. Full reasoning in `CLAUDE.md`.
 
 > **Decision required:** Whether the first paying engagements are run entirely by hand while
 > this phase is being built. Doesn't block the code, but changes how urgently Phase 1 needs to
