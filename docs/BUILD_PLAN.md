@@ -13,8 +13,8 @@ work on a later phase before the current one's acceptance test passes.**
 | Phase | Name | Status | Acceptance test |
 |---|---|---|---|
 | 0 | Skeleton | ✅ Done — 2026-07-28 | `docker compose up`, `make demo` green |
-| 1 | Intake and sandbox | ▶️ Next | Point it at a real public Foundry repo, get a reproducible build and a stored artifact set |
-| 2 | Analysis battery v1 | ⏸ Not started | Run on a repo with known issues produces a deduped finding set; re-running with suppressions applied is quieter |
+| 1 | Intake and sandbox | ✅ Done — 2026-07-28 | Point it at a real public Foundry repo, get a reproducible build and a stored artifact set |
+| 2 | Analysis battery v1 | ▶️ Next | Run on a repo with known issues produces a deduped finding set; re-running with suppressions applied is quieter |
 | 3 | Triage workbench | ⏸ Not started | Triage 100 raw findings down to a working set in under an hour |
 | 4 | Report generation | ⏸ Not started | Produce a report on a public repo defensible enough to send a paying client |
 | 5 | Client portal and remediation loop | ⏸ Not started | Re-run against a fix commit, diff findings, verify each claimed fix, issue a delta report |
@@ -40,6 +40,33 @@ live stack; `apps/workbench` was booted in dev mode and confirmed to reach `apps
 network at runtime, not just at build time.
 
 Full task-level record: [`docs/SCAFFOLDING.md`](./SCAFFOLDING.md#phase-0-skeleton-—-done).
+
+## Phase 1 — closed out
+
+Delivered: the `engagements` table plus Kysely types, engagement intake (`POST`/`GET
+/engagements` on `apps/api`, enqueues a BullMQ build job), `workers/orchestrator` as a BullMQ
+consumer wrapping a real sandbox pipeline, SSE log streaming (`GET /engagements/:id/logs`)
+fed by Redis pub/sub from the orchestrator, and the hardened-Docker build sandbox itself:
+pinned-commit clone, solc-matrix resolution (read from Foundry's own build cache, not
+guessed), two independent hardened builds per run for a determinism check, and artifact
+persistence to a Docker named volume (`valence-artifacts` — the local-dev stand-in for the
+Railway Volume attached to `workers/orchestrator` in production; deliberately not a host
+bind-mount, since Solidity build output can contain case-colliding paths that break on
+case-insensitive host filesystems). Every build container runs read-only rootfs, dropped
+capabilities, no-new-privileges, an explicit (vendored) seccomp profile, memory/CPU caps, and
+a hard wall-clock kill; only the dependency-fetch step gets network, the actual build runs
+with `--network none`. Non-Foundry repos get an explicit `not_implemented` status rather than
+a fabricated pass.
+
+Verified locally: typecheck and build clean across all five workspace packages; `make test`
+passes `apps/api`'s suite (health, engagement intake + job enqueue, SSE log streaming against
+a real Redis publish) and `workers/orchestrator`'s suite (a dedicated wall-clock-kill test,
+and the phase's acceptance test — a real clone + hardened build + determinism check against
+`foundry-rs/forge-template` at a pinned commit, asserting `deterministic: true` and a
+non-empty artifact set in the volume); `make demo` runs the same acceptance pipeline standalone
+end to end. CI now also runs the orchestrator's Docker-backed suite.
+
+Full task-level record: [`docs/SCAFFOLDING.md`](./SCAFFOLDING.md#phase-1-intake-and-sandbox-—-done).
 
 ## Decisions log
 
@@ -67,7 +94,8 @@ Carried from CLAUDE.md's "Things to raise with Jeff" — listed here against the
 blocks, so the right one gets raised at the right time instead of all at once:
 
 - **Whether first paying engagements run by hand while the workbench is built** — affects
-  phase ordering; should be resolved before or during Phase 1.
+  phase ordering. Didn't block Phase 1's code and is still open; worth resolving before Phase
+  2/3 prioritization decisions get made by default inertia.
 - **Severity model** (Code4rena/Sherlock impact×likelihood matrix vs. custom) — blocks Phase 2
   (the canonical finding model needs a severity field shape).
 - **Whether to run client code through a hosted LLM, and under what provider terms** — blocks
