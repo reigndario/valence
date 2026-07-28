@@ -64,6 +64,9 @@ jobs:
       - name: Run tests
         run: pnpm --filter @valence/api test
 
+      - name: Run orchestrator sandbox test (Foundry image + real hardened build)
+        run: pnpm --filter @valence/orchestrator test
+
       - name: Boot api and smoke-test /health
         run: |
           pnpm --filter @valence/api start &

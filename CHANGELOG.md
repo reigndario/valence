@@ -10,6 +10,18 @@ All notable changes to this project are documented here. Format follows
 - `apps/marketing` — a single public landing page, deploys to its own Vercel project. Jumped
   the queue ahead of Phase 1 to get a live public surface up sooner; doesn't block or get
   blocked by the numbered phase plan.
+- Phase 1 (intake and sandbox): the `engagements` table and intake API (`POST`/`GET
+  /engagements` on `apps/api`, enqueuing a BullMQ build job), SSE log streaming (`GET
+  /engagements/:id/logs`), and `workers/orchestrator` — a BullMQ consumer wrapping the real
+  sandbox pipeline. The pipeline clones a repo at a pinned commit, resolves the solc build
+  matrix from the repo's own Foundry build cache, runs two independent hardened Docker builds
+  (read-only rootfs, dropped capabilities, an explicit vendored seccomp profile,
+  no-new-privileges, network cut after dependency fetch, memory/CPU caps, a hard wall-clock
+  kill) for a determinism check, and persists artifacts to a Docker named volume — the
+  local-dev stand-in for the Railway Volume `workers/orchestrator` uses in production.
+  Non-Foundry repos get an explicit `not_implemented` status rather than a fabricated pass.
+  Acceptance test and `make demo` both exercise the real pipeline end to end against a real
+  public repo (`foundry-rs/forge-template`), no mocks.
 
 ### Changed
 
@@ -20,10 +32,9 @@ All notable changes to this project are documented here. Format follows
   portal will proxy file downloads through `apps/api` instead.
 
 Full reasoning for both in
-[`CLAUDE.md`](./CLAUDE.md#decisions-made-do-not-re-litigate-without-cause). Phase 1 (intake
-and sandbox) is still next on the numbered plan — see
-[`docs/BUILD_PLAN.md`](./docs/BUILD_PLAN.md) for status and
-[`docs/SCAFFOLDING.md`](./docs/SCAFFOLDING.md) for the current task checklist.
+[`CLAUDE.md`](./CLAUDE.md#decisions-made-do-not-re-litigate-without-cause). Phase 2 (analysis
+battery v1) is next on the numbered plan — see [`docs/BUILD_PLAN.md`](./docs/BUILD_PLAN.md)
+for status and [`docs/SCAFFOLDING.md`](./docs/SCAFFOLDING.md) for the current task checklist.
 
 ## [0.0.1] - 2026-07-28
 

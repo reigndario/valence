@@ -1,5 +1,5 @@
 {
-  "name": "@valence/api",
+  "name": "@valence/orchestrator",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,18 +9,15 @@
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "echo \"lint: not configured yet — eslint is not installed\" && exit 1",
-    "test": "vitest run"
+    "test": "vitest run",
+    "demo": "tsx src/demo.ts"
   },
   "dependencies": {
     "bullmq": "^5.34.0",
-    "fastify": "^5.1.0",
-    "ioredis": "^5.4.1",
-    "kysely": "^0.27.4",
-    "pg": "^8.13.1"
+    "ioredis": "^5.4.1"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
-    "@types/pg": "^8.11.10",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vitest": "^2.1.5"
