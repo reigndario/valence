@@ -1,11 +1,12 @@
 # SCAFFOLDING.md
 > Generated: 2026-07-28
 > Project: Valence
-> Stack: pnpm monorepo — Next.js 15 (workbench/portal, Vercel) / Fastify + TS (api, Railway) /
-> Python (analysis + review workers, Railway) / Postgres + Redis (Railway) / plain SQL
-> migrations via dbmate
-> Current state: Phase 0 skeleton complete and verified — compose stack, migrations, CI, and
-> a real (not stubbed) health path across api and workbench are working end to end.
+> Stack: pnpm monorepo — Next.js 15 (workbench/portal/marketing, Vercel) / Fastify + TS
+> (api, Railway) / Python (analysis + review workers, Railway) / Postgres + Redis (Railway) /
+> plain SQL migrations via dbmate / Railway Volume for artifact storage. Infra footprint is
+> deliberately just Railway + Vercel + Docker Desktop locally — no AWS, no Cloudflare.
+> Current state: Phase 0 skeleton complete and verified. `apps/marketing` (public landing
+> page, jumped the queue ahead of Phase 1) built and verified, not yet deployed.
 
 ---
 
@@ -41,6 +42,7 @@ not inferred from code.
 | Tests | 🔧 Partial | One integration test (`apps/api/src/health.test.ts`) against a real DB/Redis; no test infra yet for Python workers (don't exist yet) |
 | Git repository | ✅ Done | `github.com/reigndario/valence`, Phase 0 merged to `main` via PR #1 |
 | Vercel deployment | 🔧 Partial | `apps/workbench` project created; Deployment Protection currently disabled per Jeff's call (see `CLAUDE.md` note) |
+| `apps/marketing` | ✅ Done | Single public landing page, builds and typechecks clean, not yet deployed to its own Vercel project |
 | `apps/portal` | ❌ Missing | Phase 5 |
 | `apps/api` product routes | ❌ Missing | Auth, orgs, engagements, findings, runs, SSE log streaming — Phase 1+ |
 | `packages/findings`, `packages/report`, `packages/sdk`, `packages/cli` | ❌ Missing | Phase 1 (`cli`), Phase 2 (`findings`), Phase 4 (`report`) |
@@ -98,7 +100,7 @@ streamed logs, artifact persistence.
 - [ ] Enforce no network egress after dependency fetch, memory/CPU caps, hard wall-clock kill
 - [ ] Add a determinism check: build twice, diff artifacts
 - [ ] Stream build logs from the sandbox back through SSE on `apps/api`
-- [ ] Persist build artifacts to object storage (Cloudflare R2)
+- [ ] Persist build artifacts to a Railway Volume attached to `workers/orchestrator`
 - [ ] Add `NOT_IMPLEMENTED` responses (never a fabricated pass) for any sub-step not yet built
 - [ ] Write a test that clones a real public Foundry repo end to end and asserts a reproducible
       build plus a stored artifact set (this is the phase's acceptance test — automate it)
@@ -113,8 +115,13 @@ streamed logs, artifact persistence.
 > this phase is being built. Doesn't block the code, but changes how urgently Phase 1 needs to
 > ship and whether partial/manual workarounds are acceptable in the interim.
 
-> **External setup:** Cloudflare R2 bucket + credentials for artifact storage. Railway project
-> for `workers/orchestrator` once it needs to run outside local compose.
+> **Decided (2026-07-28):** Artifact storage is a Railway Volume (plain block storage), not an
+> object-storage vendor — the infra footprint is Railway + Vercel + Docker Desktop locally,
+> nothing else. Tradeoff: no presigned-URL downloads; Phase 5's client portal will proxy file
+> downloads through `apps/api` instead of handing out direct links.
+
+> **External setup:** Railway project + attached Volume for `workers/orchestrator` once it
+> needs to run outside local compose.
 
 ---
 

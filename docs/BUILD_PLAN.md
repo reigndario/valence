@@ -23,6 +23,13 @@ work on a later phase before the current one's acceptance test passes.**
 | 8 | CI and continuous mode | ⏸ Not started | GitHub App posts checks per commit, gated against last accepted baseline |
 | 9 | Commercial | ⏸ Not started | Multi-tenant orgs, per-engagement pricing/quotas, Stripe, RBAC, access logging |
 
+## Parallel workstream: apps/marketing
+
+Not part of the numbered phase plan above — a small public landing page (`apps/marketing`)
+jumped the queue so Valence has a live public surface while the numbered phases continue
+underneath it. No auth, no data, single static page, own Vercel project. Doesn't block or get
+blocked by Phase 1; Phase 1 resumes as the primary track once this ships.
+
 ## Phase 0 — closed out
 
 Delivered: pnpm monorepo shell (`apps/api`, `apps/workbench`), Postgres + Redis via
@@ -39,14 +46,20 @@ Full task-level record: [`docs/SCAFFOLDING.md`](./SCAFFOLDING.md#phase-0-skeleto
 Decisions already made — see [`CLAUDE.md`](../CLAUDE.md#decisions-made-do-not-re-litigate-without-cause)
 for the full reasoning:
 
-- **Hosting split** (2026-07-28): `apps/workbench` / `apps/portal` → Vercel. `apps/api`,
-  `workers/*`, Postgres, Redis → Railway, private network. Artifact storage → Cloudflare R2.
+- **Hosting split** (2026-07-28): `apps/workbench` / `apps/portal` / `apps/marketing` →
+  Vercel, each its own project. `apps/api`, `workers/*`, Postgres, Redis → Railway, private
+  network.
 - **Postgres access layer** (2026-07-28): plain SQL migrations (`infra/migrations/`, run via
   `dbmate`) as schema source of truth. TS queries via Kysely, Python via SQLAlchemy
   Core/psycopg. No ORM owns the schema.
 - **Sandbox strategy** (2026-07-28): hardened Docker (runc) for Phase 1, not gVisor or
   Firecracker. Ships on Railway with no new infrastructure; explicitly revisit (gVisor first)
   before the first paying engagement runs an adversarial repo through it.
+- **Infra footprint constraint** (2026-07-28): Railway, Vercel, and Docker Desktop locally —
+  nothing else. No AWS, no Cloudflare. Artifact storage is therefore a **Railway Volume**
+  (plain block storage on `workers/orchestrator`), not Cloudflare R2 as originally decided —
+  superseded same day. Tradeoff: no presigned-URL downloads; Phase 5's client portal proxies
+  file downloads through `apps/api` instead.
 
 ## Pending decisions (blocking future phases)
 

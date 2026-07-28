@@ -24,23 +24,43 @@ Python, TypeScript. Assume crypto and DeFi fluency.
 - Every phase ends with tests that run and a `make demo` Jeff can execute locally.
 - Never fabricate a finding, a severity, or a tool result. If a stage is unimplemented it
   returns `NOT_IMPLEMENTED`, never an empty pass.
+- No AWS services and no Cloudflare services, anywhere in the stack. The infra footprint is
+  **Railway, Vercel, and Docker Desktop locally — nothing else** unless Jeff explicitly adds
+  a fourth. Factor this out of any future option set (managed sandbox providers, storage
+  alternatives, etc.) rather than presenting AWS/Cloudflare options at all.
+- Prefer fewer dependencies and less new infrastructure over stronger guarantees, when the
+  choice is close. This is why hardened Docker beat gVisor/Firecracker/a managed sandbox
+  provider for Phase 1's sandbox strategy, and why artifact storage is a Railway Volume
+  instead of an object-storage vendor — see below.
 
 ## Decisions made (do not re-litigate without cause)
 
-**Hosting split:** `apps/workbench` and `apps/portal` (Next.js 15) deploy to **Vercel**. Note:
-Vercel Authentication (Deployment Protection) is currently **disabled** on the `valence`
-Vercel project, by Jeff's explicit choice, for convenience while there's no application-level
-auth yet and nothing sensitive deployed — this makes every deployment, including previews,
-publicly reachable with no login. Re-enable (Standard Protection, or a custom production
-domain if the goal is a public marketing surface) before any real engagement data ever renders
-in `apps/workbench`, per the client confidentiality constraint below.
-`apps/api`, `workers/orchestrator`, `workers/analysis`, `workers/review`, Postgres, and Redis
-all live on **Railway**, on a private network together. Reasoning: the API and workers are
-long-running processes (SSE streaming, queue consumers, container provisioning for sandboxed
-builds) that don't fit serverless execution limits and need to reach Postgres/Redis and each
-other privately. Frontends are the only pieces that cross a public boundary, calling the API
-over its public Railway URL. Final artifact/report storage: Cloudflare R2 (S3-compatible,
-cheap egress), not Supabase Storage — no other reason exists yet to add Supabase to the stack.
+**Hosting split:** `apps/workbench`, `apps/portal`, and `apps/marketing` (all Next.js 15)
+deploy to **Vercel**, each as its own Vercel project. Note: Vercel Authentication (Deployment
+Protection) is currently **disabled** on the `workbench` Vercel project, by Jeff's explicit
+choice, for convenience while there's no application-level auth yet and nothing sensitive
+deployed — this makes every deployment, including previews, publicly reachable with no login.
+Re-enable (Standard Protection) before any real engagement data ever renders in
+`apps/workbench`, per the client confidentiality constraint below. `apps/marketing` is meant
+to be public, so this doesn't apply to it. `apps/api`, `workers/orchestrator`,
+`workers/analysis`, `workers/review`, Postgres, and Redis all live on **Railway**, on a
+private network together. Reasoning: the API and workers are long-running processes (SSE
+streaming, queue consumers, container provisioning for sandboxed builds) that don't fit
+serverless execution limits and need to reach Postgres/Redis and each other privately.
+Frontends are the only pieces that cross a public boundary, calling the API over its public
+Railway URL. Final artifact/report storage: a **Railway Volume** (plain block storage)
+attached to `workers/orchestrator`, not an object-storage vendor — no S3-compatible service
+fit inside the "just Railway, Vercel, Docker Desktop" infra constraint. Tradeoff: no
+presigned-URL downloads, so the Phase 5 client portal will need to proxy file downloads
+through `apps/api` rather than handing out direct links. Revisit if that proxying becomes a
+real bottleneck.
+
+**Costs (only two things actually bill so far):** Railway (Postgres + Redis + api + volume,
+running continuously — the main bill-driver) and Vercel (the Hobby/free plan's terms exclude
+commercial use, so a paid plan is expected once this is a live business tool, not a nice-to-
+have). Everything else in the stack today is open-source and free. The largest future cost
+isn't infra — it's LLM API calls once Phase 7's review pipeline exists (per-chunk model calls
+plus corpus embeddings), which is also still an open provider-terms question below.
 
 **Postgres access layer:** plain versioned SQL migration files in `infra/migrations/` are the
 single source of truth for schema. TypeScript (`apps/api`, `workers/orchestrator`) queries
@@ -134,6 +154,9 @@ valence/
                      queue, report editor. Build this first. Deploys to Vercel.
     portal/         Client-facing: engagement status, findings, remediation, report download.
                      Phase 5. Deploys to Vercel.
+    marketing/      Public landing page — not part of the numbered phase plan, jumped the
+                     queue to get a live public surface up sooner. No auth, no data, single
+                     page. Deploys to Vercel, own project.
     api/            Fastify + TS. Auth, orgs, engagements, findings, runs, SSE log streaming.
                      Deploys to Railway.
   packages/
@@ -156,8 +179,7 @@ valence/
 ```
 
 Postgres for engagements, runs, findings, suppressions, clients. Redis and BullMQ for the
-queue. S3-compatible storage (Cloudflare R2) for artifacts, logs, and report bundles. SSE for
-live logs.
+queue. A Railway Volume for artifacts, logs, and report bundles. SSE for live logs.
 
 Flow for one engagement: intake records repo, commit hash, scope globs, docs links, and
 deadline. Orchestrator clones at the pinned commit into a sandbox, resolves the build matrix,
