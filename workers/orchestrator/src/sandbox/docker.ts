@@ -87,10 +87,25 @@ export async function runHardenedContainer(opts: RunContainerOptions): Promise<R
   return new Promise((resolve, reject) => {
     const child = spawn("docker", dockerArgs);
     let timedOut = false;
+    let settled = false;
+
+    // `docker kill` on a container that isn't registered with the daemon yet (the timer can
+    // fire before `docker run` has finished creating it) is a silent no-op, not an error —
+    // so a single fire-and-forget attempt can lose the race and leave the container running
+    // for its full duration. Retry briefly until it's confirmed gone or the child exits.
+    function killWithRetry(attemptsLeft: number) {
+      if (settled || attemptsLeft <= 0) return;
+      const killer = spawn("docker", ["kill", opts.name]);
+      killer.on("close", (killCode) => {
+        if (!settled && killCode !== 0) {
+          setTimeout(() => killWithRetry(attemptsLeft - 1), 250);
+        }
+      });
+    }
 
     const timer = setTimeout(() => {
       timedOut = true;
-      spawn("docker", ["kill", opts.name]);
+      killWithRetry(20);
     }, opts.timeoutMs);
 
     const stdout = makeLineForwarder("stdout", opts.onLog);
@@ -100,11 +115,13 @@ export async function runHardenedContainer(opts: RunContainerOptions): Promise<R
     child.stderr.on("data", (chunk: Buffer) => stderr.push(chunk));
 
     child.on("error", (err) => {
+      settled = true;
       clearTimeout(timer);
       reject(err);
     });
 
     child.on("close", (code) => {
+      settled = true;
       clearTimeout(timer);
       stdout.flush();
       stderr.flush();

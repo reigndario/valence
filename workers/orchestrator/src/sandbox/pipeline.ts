@@ -60,8 +60,18 @@ export async function runBuildPipeline(input: PipelineInput): Promise<PipelineRe
     const fetchResult = await runHardenedContainer({
       name: `valence-fetch-${runId}`,
       image: config.foundryImage,
-      entrypoint: "forge",
-      args: ["build"],
+      entrypoint: "sh",
+      // The repo checkout is host-owned (git ran on the host, not uid 1000), but this
+      // container's own writes (cache/, out/) are owned by uid 1000 — on a real Linux
+      // Docker host (unlike Docker Desktop's permissive macOS volume sharing), the host
+      // process cleaning up this workspace afterward can't unlink files inside directories
+      // it doesn't have write access to. Open those directories up before exiting; the
+      // chmod attempt on host-owned paths is expected to fail and is swallowed, and forge's
+      // real exit code is preserved regardless of how the chmod went.
+      args: [
+        "-c",
+        "forge build; EXIT=$?; chmod -R 777 /workspace-src 2>/dev/null; exit $EXIT",
+      ],
       network: "bridge",
       user: "foundry",
       workdir: "/workspace-src",
