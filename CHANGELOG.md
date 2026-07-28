@@ -25,6 +25,12 @@ All notable changes to this project are documented here. Format follows
 
 ### Changed
 
+- Phase-checklist scaffolding policy: `CLAUDE.md`'s working agreement now calls for full
+  task-level checklists across all phases (0-9) up front, drafted in
+  [`docs/SCAFFOLDING.md`](./docs/SCAFFOLDING.md) (bumped to its own schema v2.0.0, with a
+  revision history, a semver policy, stable `P{phase}-{seq}` item IDs, and a status legend),
+  superseding the prior "no speculative scaffolding for later phases" rule for planning
+  purposes. Execution itself is still strictly one phase at a time.
 - Artifact storage: **Railway Volume** (plain block storage), superseding the Cloudflare R2
   decision from Phase 0 the same day. Driven by a new standing constraint: infra is Railway +
   Vercel + Docker Desktop locally, nothing else — no AWS, no Cloudflare, fewer dependencies
