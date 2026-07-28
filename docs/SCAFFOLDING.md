@@ -1,11 +1,12 @@
 # SCAFFOLDING.md
 > Generated: 2026-07-28
 > Project: Valence
-> Stack: pnpm monorepo — Next.js 15 (workbench/portal, Vercel) / Fastify + TS (api, Railway) /
-> Python (analysis + review workers, Railway) / Postgres + Redis (Railway) / plain SQL
-> migrations via dbmate
-> Current state: Phase 0 skeleton complete and verified — compose stack, migrations, CI, and
-> a real (not stubbed) health path across api and workbench are working end to end.
+> Stack: pnpm monorepo — Next.js 15 (workbench/portal/marketing, Vercel) / Fastify + TS
+> (api, Railway) / Python (analysis + review workers, Railway) / Postgres + Redis (Railway) /
+> plain SQL migrations via dbmate / Railway Volume for artifact storage. Infra footprint is
+> deliberately just Railway + Vercel + Docker Desktop locally — no AWS, no Cloudflare.
+> Current state: Phase 0 skeleton complete and verified. `apps/marketing` (public landing
+> page, jumped the queue ahead of Phase 1) built and verified, not yet deployed.
 
 ---
 
@@ -36,14 +37,17 @@ not inferred from code.
 | Migrations | ✅ Done | `dbmate`, one bootstrap migration (`pgcrypto` extension) — no product tables yet, by design |
 | `apps/api` health path | ✅ Done | `GET /health` checks live Postgres + Redis connectivity, not just process liveness |
 | `apps/workbench` | 🔧 Partial | One page that server-fetches `apps/api`'s `/health` and renders it — proves the split works, no product UI yet |
-| CI | ✅ Done | GitHub Actions: install, typecheck, build, migrate, test, smoke-test `/health` — written and passing locally against the same steps, not yet run against a pushed GitHub repo |
+| CI | ✅ Done | GitHub Actions, confirmed green on a real run against `reigndario/valence` (fixed a `pnpm/action-setup` version conflict along the way) |
+| Lint | ❌ Missing | `eslint`/`next lint` were never wired up in Phase 0; both scripts now fail loudly and honestly rather than silently no-op |
 | Tests | 🔧 Partial | One integration test (`apps/api/src/health.test.ts`) against a real DB/Redis; no test infra yet for Python workers (don't exist yet) |
-| Git repository | ❌ Missing | Directory is not yet a git repo — nothing committed |
+| Git repository | ✅ Done | `github.com/reigndario/valence`, Phase 0 merged to `main` via PR #1 |
+| Vercel deployment | 🔧 Partial | `apps/workbench` project created; Deployment Protection currently disabled per Jeff's call (see `CLAUDE.md` note) |
+| `apps/marketing` | ✅ Done | Single public landing page, builds and typechecks clean, not yet deployed to its own Vercel project |
 | `apps/portal` | ❌ Missing | Phase 5 |
 | `apps/api` product routes | ❌ Missing | Auth, orgs, engagements, findings, runs, SSE log streaming — Phase 1+ |
 | `packages/findings`, `packages/report`, `packages/sdk`, `packages/cli` | ❌ Missing | Phase 1 (`cli`), Phase 2 (`findings`), Phase 4 (`report`) |
 | `workers/orchestrator`, `workers/analysis`, `workers/review` | ❌ Missing | Phase 1, Phase 2, Phase 7 respectively |
-| Sandboxed build execution | ❌ Missing | Phase 1 — security boundary for untrusted client repos, strategy not yet decided |
+| Sandboxed build execution | ❌ Missing | Phase 1 — strategy decided (hardened Docker), not yet built |
 | `corpus/` | ❌ Missing | Phase 7 |
 | Deployment config (Vercel/Railway) | ❌ Missing | Hosting split decided (see `CLAUDE.md`) but no actual Vercel/Railway project wired up yet |
 
@@ -89,29 +93,35 @@ streamed logs, artifact persistence.
 - [ ] Build engagement intake: API route to create an engagement record
 - [ ] Stand up `workers/orchestrator` (TS) as a BullMQ queue consumer skeleton
 - [ ] Implement pinned-commit clone into an isolated workspace (tmpfs, read-only root)
-- [ ] Resolve the solc build matrix and run `forge build` per version, checked against the
-      chosen sandbox strategy (see decision below)
+- [ ] Resolve the solc build matrix and run `forge build` per version, inside a hardened
+      Docker container (runc) — see decision below
+- [ ] Harden the build container: read-only rootfs, tmpfs workspace, dropped capabilities,
+      seccomp profile, `no-new-privileges`
 - [ ] Enforce no network egress after dependency fetch, memory/CPU caps, hard wall-clock kill
 - [ ] Add a determinism check: build twice, diff artifacts
 - [ ] Stream build logs from the sandbox back through SSE on `apps/api`
-- [ ] Persist build artifacts to object storage (Cloudflare R2)
+- [ ] Persist build artifacts to a Railway Volume attached to `workers/orchestrator`
 - [ ] Add `NOT_IMPLEMENTED` responses (never a fabricated pass) for any sub-step not yet built
 - [ ] Write a test that clones a real public Foundry repo end to end and asserts a reproducible
       build plus a stored artifact set (this is the phase's acceptance test — automate it)
 - [ ] Update `docs/BUILD_PLAN.md` status table and this file when the acceptance test passes
 
-> **Decision required:** Sandbox strategy — Docker vs. gVisor vs. Firecracker. This is the
-> security boundary for arbitrary, untrusted client repos and is expensive to reverse once
-> `workers/orchestrator` is built against one model. Per the working agreement, this needs
-> options-with-tradeoffs presented before any sandbox code is written — do not default to
-> plain Docker containers without raising this first.
+> **Decided (2026-07-28):** Sandbox strategy is hardened Docker (runc), not gVisor or
+> Firecracker, for Phase 1 — ships on Railway with no new infrastructure. Explicit tradeoff:
+> revisit (gVisor first) before the first paying engagement runs an adversarial repo through
+> it. Full reasoning in `CLAUDE.md`.
 
 > **Decision required:** Whether the first paying engagements are run entirely by hand while
 > this phase is being built. Doesn't block the code, but changes how urgently Phase 1 needs to
 > ship and whether partial/manual workarounds are acceptable in the interim.
 
-> **External setup:** Cloudflare R2 bucket + credentials for artifact storage. Railway project
-> for `workers/orchestrator` once it needs to run outside local compose.
+> **Decided (2026-07-28):** Artifact storage is a Railway Volume (plain block storage), not an
+> object-storage vendor — the infra footprint is Railway + Vercel + Docker Desktop locally,
+> nothing else. Tradeoff: no presigned-URL downloads; Phase 5's client portal will proxy file
+> downloads through `apps/api` instead of handing out direct links.
+
+> **External setup:** Railway project + attached Volume for `workers/orchestrator` once it
+> needs to run outside local compose.
 
 ---
 

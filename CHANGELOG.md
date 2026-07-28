@@ -5,7 +5,23 @@ All notable changes to this project are documented here. Format follows
 
 ## [Unreleased]
 
-Nothing yet — Phase 1 (intake and sandbox) is next. See
+### Added
+
+- `apps/marketing` — a single public landing page, deploys to its own Vercel project. Jumped
+  the queue ahead of Phase 1 to get a live public surface up sooner; doesn't block or get
+  blocked by the numbered phase plan.
+
+### Changed
+
+- Artifact storage: **Railway Volume** (plain block storage), superseding the Cloudflare R2
+  decision from Phase 0 the same day. Driven by a new standing constraint: infra is Railway +
+  Vercel + Docker Desktop locally, nothing else — no AWS, no Cloudflare, fewer dependencies
+  preferred when a choice is close. Tradeoff: no presigned-URL downloads; Phase 5's client
+  portal will proxy file downloads through `apps/api` instead.
+
+Full reasoning for both in
+[`CLAUDE.md`](./CLAUDE.md#decisions-made-do-not-re-litigate-without-cause). Phase 1 (intake
+and sandbox) is still next on the numbered plan — see
 [`docs/BUILD_PLAN.md`](./docs/BUILD_PLAN.md) for status and
 [`docs/SCAFFOLDING.md`](./docs/SCAFFOLDING.md) for the current task checklist.
 
