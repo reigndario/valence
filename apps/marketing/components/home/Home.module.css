@@ -1,0 +1,194 @@
+/* Hero */
+.hero {
+  padding: 5.5rem 1.5rem 4rem;
+  max-width: 820px;
+}
+
+.heroHeadline {
+  font-size: clamp(2.1rem, 5vw, 3.25rem);
+  line-height: 1.15;
+  margin-bottom: 2rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Tooling strip */
+.toolingStrip {
+  padding: 2rem 1.5rem 4rem;
+}
+
+.toolingLabel {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 1.25rem;
+}
+
+.toolingList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+}
+
+.toolingItem {
+  font-size: 1.05rem;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+
+/* Code / rule panel */
+.panelSection {
+  padding: 2rem 1.5rem 5rem;
+}
+
+.panelLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-bottom: 1.25rem;
+}
+
+.panelGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.codeBlock {
+  background: var(--code-bg);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.codeBlockFilename {
+  padding: 0.85rem 1.25rem;
+  font-size: 0.8rem;
+  color: var(--code-text-dim);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.codeBlockPre {
+  margin: 0;
+  padding: 1.25rem;
+  color: var(--code-text);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.panelLearnMore {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 800px) {
+  .panelGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Feature callouts */
+.featuresSection {
+  padding: 2rem 1.5rem 5rem;
+}
+
+.featuresList {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.featureCard {
+  padding: 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.featureTitle {
+  font-size: 1.1rem;
+  margin-bottom: 0.6rem;
+}
+
+.featureBody {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 800px) {
+  .featuresList {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Comparison cards */
+.comparisonSection {
+  padding: 2rem 1.5rem 6rem;
+}
+
+.comparisonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.comparisonCard {
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comparisonTitle {
+  font-size: 1.3rem;
+}
+
+.comparisonTagline {
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+
+.comparisonBullets {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.comparisonBullets li {
+  padding-left: 1.25rem;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.comparisonBullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mint);
+}
+
+.comparisonCard .btn {
+  align-self: flex-start;
+}
+
+@media (max-width: 800px) {
+  .comparisonGrid {
+    grid-template-columns: 1fr;
+  }
+}

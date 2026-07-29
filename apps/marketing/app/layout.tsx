@@ -1,16 +1,22 @@
 import type { ReactNode } from "react";
+import Header from "../components/Header/Header";
+import Footer from "../components/Footer/Footer";
 import "./globals.css";
 
 export const metadata = {
-  title: "Valence — Pre-Audit Readiness Reviews",
+  title: "Valence — Formal Verification and Security Audits",
   description:
-    "Valence runs pre-audit readiness reviews for Web3 protocols before a paid security audit — triaged findings, a named blocker list, an invariant inventory, and coverage gaps your auditor can act on.",
+    "Valence secures smart contracts with Warden (formal verification), Scout (an AI review agent), Foil (mutation testing), and expert security audits.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Header />
+        <main className="site-main">{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 }

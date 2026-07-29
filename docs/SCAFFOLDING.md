@@ -101,7 +101,7 @@ not inferred from code.
 | Tests | ✅ Done | `apps/api`: health, engagement intake, SSE log streaming (all against a real DB/Redis). `workers/orchestrator`: hardened-container wall-clock kill, and the Phase 1 acceptance test (real clone + hardened build + determinism check against a real public repo). No test infra yet for Python workers (don't exist yet) |
 | Git repository | ✅ Done | `github.com/reigndario/valence`, Phase 0 merged to `main` via PR #1, sandbox-strategy decision doc merged via PR #2, Phase 1 merged via PR #3 |
 | Vercel deployment | 🔧 Partial | `apps/workbench` project created; Deployment Protection currently disabled per Sophie's call (see `CLAUDE.md` note) |
-| `apps/marketing` | ✅ Done | Single public landing page, builds and typechecks clean, not yet deployed to its own Vercel project |
+| `apps/marketing` | ✅ Done | Multi-page public site (home, Products/Warden/Scout/Foil, Security Services/Audits/Enterprise/Pricing, Blog, About, Docs, Contact, Terms, Privacy) with a keyboard-operable nav, builds and typechecks clean, not yet deployed to its own Vercel project |
 | `apps/portal` | ⏸ Not Started | Phase 8 |
 | `apps/api` product routes | 🔧 Partial | Engagement intake (`POST`/`GET /engagements`, `GET /engagements/:id`), SSE log streaming (`GET /engagements/:id/logs`), and run listing (`GET /engagements/:id/runs`, backed by the new `runs` table) done; auth, orgs, findings still to come |
 | `packages/findings`, `packages/report` | ⏸ Not Started | Phase 3 (`findings`), Phase 4 (`report`) |
