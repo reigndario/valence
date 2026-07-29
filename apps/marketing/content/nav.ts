@@ -38,6 +38,8 @@ export const navGroups: NavGroup[] = [
 
 export const docsLink: NavLink = { label: "Docs", href: "/docs" };
 
+export const dollarLink: NavLink = { label: "$0.99", href: "/0.99" };
+
 export const primaryCta: NavLink = { label: "Get started free", href: "/contact" };
 
 export type SocialLink = {

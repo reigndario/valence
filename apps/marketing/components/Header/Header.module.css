@@ -162,6 +162,19 @@
   background: var(--surface);
 }
 
+.dollarButton {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  background: var(--peach);
+  color: var(--btn-text);
+}
+
+.dollarButton:hover,
+.dollarButton:focus-visible {
+  background: var(--peach);
+  opacity: 0.85;
+}
+
 .chevron {
   transition: transform 0.15s ease;
   color: var(--text-dim);

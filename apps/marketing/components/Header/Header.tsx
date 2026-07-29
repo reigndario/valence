@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, FocusEvent, KeyboardEvent } from "react";
 import Link from "next/link";
-import { navGroups, docsLink, primaryCta, socialLinks } from "../../content/nav";
+import { navGroups, docsLink, dollarLink, primaryCta, socialLinks } from "../../content/nav";
 import { GithubIcon, TwitterIcon, LinkedinIcon, MenuIcon, CloseIcon, ChevronIcon } from "../icons";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import styles from "./Header.module.css";
@@ -161,6 +161,11 @@ export default function Header() {
                 {docsLink.label}
               </Link>
             </li>
+            <li className={styles.navItem}>
+              <Link href={dollarLink.href} className={`${styles.navButton} ${styles.dollarButton}`}>
+                {dollarLink.label}
+              </Link>
+            </li>
           </ul>
         </nav>
 
@@ -227,6 +232,11 @@ export default function Header() {
             <li className={styles.mobileAccordionItem}>
               <Link href={docsLink.href} className={styles.mobileAccordionButton} onClick={closeMobile}>
                 {docsLink.label}
+              </Link>
+            </li>
+            <li className={styles.mobileAccordionItem}>
+              <Link href={dollarLink.href} className={styles.mobileAccordionButton} onClick={closeMobile}>
+                {dollarLink.label}
               </Link>
             </li>
           </ul>
