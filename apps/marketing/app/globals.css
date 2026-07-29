@@ -10,9 +10,20 @@
   --code-bg: #22242b;
   --code-text: #e8e9ec;
   --code-text-dim: #9a9fab;
+  --logo-color: #6a5aa8;
+  --btn-text: #2b2a2e;
   --max-width: 1180px;
   --header-height: 88px;
   --header-height-compact: 64px;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0a0a0b;
+  --surface: #18181b;
+  --border: #2d2d31;
+  --text: #f5f4f2;
+  --text-dim: #a7a4ac;
+  --logo-color: #c9b8ff;
 }
 
 * {
@@ -27,6 +38,7 @@ body {
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   line-height: 1.5;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 body {
@@ -98,7 +110,7 @@ button {
 
 .btn-primary {
   background: var(--lavender);
-  color: var(--text);
+  color: var(--btn-text);
 }
 
 .btn-secondary {

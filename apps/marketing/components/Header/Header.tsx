@@ -5,6 +5,7 @@ import type { FocusEvent, KeyboardEvent } from "react";
 import Link from "next/link";
 import { navGroups, docsLink, primaryCta, socialLinks } from "../../content/nav";
 import { GithubIcon, TwitterIcon, LinkedinIcon, MenuIcon, CloseIcon, ChevronIcon } from "../icons";
+import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import styles from "./Header.module.css";
 
 const socialIcons = { github: GithubIcon, twitter: TwitterIcon, linkedin: LinkedinIcon };
@@ -173,6 +174,8 @@ export default function Header() {
             {primaryCta.label}
           </Link>
         </div>
+
+        <ThemeToggle />
 
         <button
           type="button"

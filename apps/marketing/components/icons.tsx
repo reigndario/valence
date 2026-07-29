@@ -45,3 +45,20 @@ export function ChevronIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
+export function SunIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true">
+      <circle cx="8" cy="8" r="3.2" />
+      <path d="M8 1v1.6M8 13.4V15M2.6 8H1M15 8h-1.6M3.75 3.75l1.13 1.13M11.12 11.12l1.13 1.13M3.75 12.25l1.13-1.13M11.12 4.88l1.13-1.13" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function MoonIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M13.8 9.9A6 6 0 0 1 6.1 2.2a6 6 0 1 0 7.7 7.7Z" />
+    </svg>
+  );
+}

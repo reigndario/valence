@@ -24,10 +24,11 @@
 }
 
 .logo {
-  font-weight: 700;
-  font-size: 1.25rem;
+  font-family: var(--font-instrument-serif), Georgia, serif;
+  font-weight: 400;
+  font-size: 2rem;
   text-decoration: none;
-  color: var(--text);
+  color: var(--logo-color);
   flex-shrink: 0;
 }
 
