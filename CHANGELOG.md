@@ -36,6 +36,20 @@ All notable changes to this project are documented here. Format follows
 
 ### Changed
 
+- `apps/marketing` rebuilt from a single static landing page into a full multi-page site: a
+  keyboard-operable header with mega-menu dropdowns (Products, Security Services, Community,
+  Company) and a mobile hamburger/accordion overlay, a footer mirroring the nav, and stub pages
+  for every nav route (Warden/Scout/Foil, Audits/Enterprise/Pricing, Blog, About, Docs, Contact,
+  Terms, Privacy). Home page now runs hero → tooling strip (Foundry/Slither/Halmos/Z3, no
+  invented client logos) → a two-pane code/rule panel (a real compiling `transferFrom` beside
+  illustrative WSL, no live status badge since nothing actually ran) → three feature callouts →
+  two comparison cards. Palette replaced with Valence's warm pastel scheme
+  (`apps/marketing/app/globals.css`); all copy moved into typed objects under
+  `apps/marketing/content/`. Adds a package-scoped `vitest` + `@testing-library/react` setup
+  with keyboard/accordion tests for the nav.
+- `CLAUDE.md` condensed from the full project brief into a short pointer file; the business
+  context, architecture, and phase-by-phase build plan it used to carry now live solely in
+  `docs/SCAFFOLDING.md`.
 - Two Phase 2 decisions resolved per the working agreement's "raise before committing" rule:
   workbench auth is a Next.js middleware shared-secret cookie (chosen over Vercel Standard
   Protection, which is deployment-wide and can't leave `/trial`/`/report/[id]` public while

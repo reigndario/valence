@@ -1,0 +1,214 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid transparent;
+}
+
+.headerScrolled {
+  border-bottom-color: var(--border);
+  box-shadow: 0 4px 16px rgba(43, 42, 46, 0.06);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: var(--header-height);
+  transition: height 0.15s ease;
+}
+
+.headerScrolled .inner {
+  height: var(--header-height-compact);
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-decoration: none;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.desktopNav {
+  flex: 1;
+}
+
+.navList {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.navButton:hover,
+.navButton:focus-visible {
+  background: var(--surface);
+}
+
+.chevron {
+  transition: transform 0.15s ease;
+  color: var(--text-dim);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  color: var(--text-dim);
+}
+
+.dropdownPanel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  min-width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem;
+}
+
+.dropdownPanel a {
+  display: block;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.dropdownPanel a:hover,
+.dropdownPanel a:focus-visible {
+  background: var(--bg);
+}
+
+.dropdownLinkLabel {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.dropdownLinkDescription {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-shrink: 0;
+}
+
+.socialList {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.socialList a {
+  color: var(--text-dim);
+  display: flex;
+}
+
+.socialList a:hover {
+  color: var(--text);
+}
+
+.mobileToggle {
+  display: none;
+  background: transparent;
+  border: none;
+  padding: 0.4rem;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.mobileNav {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .desktopNav,
+  .actions {
+    display: none;
+  }
+
+  .mobileToggle {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .mobileNav {
+    display: block;
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    padding: 1rem 1.5rem 1.5rem;
+    z-index: 40;
+  }
+
+  .headerScrolled .mobileNav {
+    top: var(--header-height-compact);
+  }
+
+  .mobileAccordionItem {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobileAccordionButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    border: none;
+    padding: 1rem 0.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .mobileAccordionPanel {
+    padding: 0 0.25rem 1rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .mobileAccordionPanel a {
+    color: var(--text-dim);
+    text-decoration: none;
+    display: block;
+    padding: 0.35rem 0;
+  }
+
+  .mobileNav .btn {
+    display: flex;
+    width: 100%;
+    margin-top: 1.25rem;
+  }
+}
