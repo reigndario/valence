@@ -1,4 +1,5 @@
 import { Worker } from "bullmq";
+import { persistRunResult } from "./persist-run.js";
 import { BUILD_QUEUE_NAME, type BuildJobData } from "./queue.js";
 import { queueConnection } from "./redis.js";
 import { makeRedisLogSink } from "./sandbox/log-publisher.js";
@@ -8,7 +9,9 @@ export const buildWorker = new Worker<BuildJobData>(
   BUILD_QUEUE_NAME,
   async (job) => {
     const onLog = makeRedisLogSink(job.data.engagementId);
-    return runBuildPipeline({ ...job.data, onLog });
+    const result = await runBuildPipeline({ ...job.data, onLog });
+    await persistRunResult(result);
+    return result;
   },
   { connection: queueConnection },
 );

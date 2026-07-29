@@ -1,6 +1,6 @@
 # BUILD_PLAN.md
 > Project: Valence
-> Last updated: 2026-07-28
+> Last updated: 2026-07-29
 
 Master phase-by-phase status tracker. The full description of each phase — what it delivers,
 its acceptance test — lives in [`CLAUDE.md`](../CLAUDE.md#phase-plan) and is not duplicated
@@ -18,7 +18,7 @@ acceptance test passes.**
 |---|---|---|---|
 | 0 | Skeleton | ✅ Done — 2026-07-28 | `docker compose up`, `make demo` green |
 | 1 | Intake and sandbox | ✅ Done — 2026-07-28 | Point it at a real public Foundry repo, get a reproducible build and a stored artifact set |
-| 2 | Marketing funnel UI v1 | ▶️ Next | Public trial flow on a real repo gets a no-login, CTA'd report URL; 100 synthetic findings triaged in under an hour |
+| 2 | Marketing funnel UI v1 | 🔧 In progress | Public trial flow on a real repo gets a no-login, CTA'd report URL; 100 synthetic findings triaged in under an hour |
 | 3 | Analysis battery v1 | ⏸ Not started | Run on a repo with known issues produces a deduped finding set; re-running with suppressions applied is quieter |
 | 4 | Report generation | ⏸ Not started | Produce a report on a public repo defensible enough to send a paying client |
 | 5 | Warden v1 | ⏸ Not started | Correct ERC20 proves; broken `transferFrom` returns `VIOLATED` with a correct call trace; unbounded loop returns `UNKNOWN` with a stated reason |
@@ -81,6 +81,29 @@ end to end. CI now also runs the orchestrator's Docker-backed suite.
 
 Full task-level record: [`docs/SCAFFOLDING.md`](./SCAFFOLDING.md#phase-1-intake-and-sandbox-—-done).
 
+## Phase 2 — in progress
+
+Delivered so far: the shared-secret middleware auth gate (P2-08) in `apps/workbench`, gating
+every route except the `/trial` and `/report/[id]` allowlist; the engagement list view (`/`)
+and an engagement detail view with run history and a live SSE-fed log viewer (P2-01, P2-02).
+
+Getting there required a fix Phase 1 left open: `workers/orchestrator`'s pipeline computed a
+`PipelineResult` per run but never persisted it anywhere queryable — only an ephemeral BullMQ
+job return value. Added a `runs` Postgres table (migration `20260729120000_runs.sql`),
+`workers/orchestrator/src/persist-run.ts` to write each run's result after the pipeline
+completes, and `GET /engagements` / `GET /engagements/:id/runs` on `apps/api`.
+
+Verified locally: typecheck and build clean across all workspace packages; `apps/api`'s and
+`workers/orchestrator`'s suites pass (7 and 3 tests respectively, including two new ones for
+run listing and run persistence against a real Postgres). The auth gate and the log viewer were
+also exercised manually against live dev servers — confirmed the redirect-to-login on an
+unauthenticated request, the public allowlist staying open, the login cookie flow, and a Redis
+`PUBLISH` reaching the browser-side `EventSource` as a parsed log line end to end.
+
+Still open: the triage queue (P2-03–07), the self-serve trial flow (P2-10), the public report
+page itself (P2-11), and the opt-in mechanism for P2-12 (the *policy* — no public-by-default —
+is decided; the toggle isn't built yet).
+
 ## Decisions log
 
 Decisions already made — see [`CLAUDE.md`](../CLAUDE.md#decisions-made-do-not-re-litigate-without-cause)
@@ -111,6 +134,13 @@ for the full reasoning:
   2–9 → 2–11; old Phase 7 (LLM review pipeline) absorbed into new Phase 6 (Scout). Full
   reasoning and the item-ID remapping table are in `docs/SCAFFOLDING.md`'s v3.0.0 revision-
   history entry.
+- **Workbench auth and public-report defaults** (2026-07-29): `apps/workbench` auth is a
+  Next.js middleware shared-secret cookie gating every route except an explicit `/trial` +
+  `/report/[id]` allowlist, chosen because Vercel's deployment-wide Standard Protection can't
+  gate one without blocking the other. Separately, no run is public by default — every run
+  starts private, sharing requires an explicit, logged per-run action. Closes both P2-08 and
+  the decision blocking P2-12; full reasoning in `docs/SCAFFOLDING.md`'s v3.1.0 revision-
+  history entry and `CLAUDE.md`'s "Decisions made" section.
 
 ## Pending decisions (blocking future phases)
 
@@ -120,8 +150,6 @@ blocks, so the right one gets raised at the right time instead of all at once:
 - **The Warden engine decision** (orchestrate open-source engines vs. fork Certora's Prover
   vs. build a verification-condition generator + solver portfolio) — blocks Phase 5, the
   single biggest architecture call in the new product line.
-- **Whether the self-serve trial flow is public-by-default for non-client runs** — blocks
-  Phase 2's shareable-report opt-in mechanism.
 - **Whether first paying engagements run by hand while the workbench is built** — affects
   phase ordering. Didn't block Phase 1's code and is still open; worth resolving before Phase
   2/3 prioritization decisions get made by default inertia.
