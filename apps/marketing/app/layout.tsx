@@ -13,7 +13,7 @@ const instrumentSerif = Instrument_Serif({
 export const metadata = {
   title: "Valence — Formal Verification and Security Audits",
   description:
-    "Valence secures smart contracts with Warden (formal verification), Scout (an AI review agent), Foil (mutation testing), and expert security audits.",
+    "Valence secures smart contracts with Artemis (formal verification), Scout (an AI review agent), Foil (mutation testing), and expert security audits.",
 };
 
 const themeInitScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();`;

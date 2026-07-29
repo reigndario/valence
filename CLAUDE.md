@@ -2,7 +2,7 @@
 
 Valence is a Web3 security firm that sells pre-audits: the engagement a protocol runs in the
 weeks before a paid audit with a top-tier firm, or instead of one when they can't afford it.
-Warden (formal verification), Scout (an AI agent that infers intent, writes rules for it, and
+Artemis (formal verification), Scout (an AI agent that infers intent, writes rules for it, and
 separately hunts bugs), and Foil (mutation testing) are the automated engine layer — same shape
 as Certora's Prover/AutoProver/Gambit, EVM-only for v1. Sophie works with VS Code, Foundry,
 Vercel, and Railway. Solidity, Python, TypeScript. Assume crypto and DeFi fluency.
@@ -25,7 +25,7 @@ dark one.
   `#F3C9B2`. Buttons use dark charcoal text on the pastel fill, never white-on-pastel.
 - Code panels are the one deliberate contrast point: dark slate `#22242B` with light text.
 
-**Nav:** Products (Warden/Scout/Foil, one-line descriptions each) · Security Services (Security
+**Nav:** Products (Artemis/Scout/Foil, one-line descriptions each) · Security Services (Security
 Audits, Enterprise, Pricing) · Community (Blog) · Company (About) · standalone Docs link. Social
 icons + primary CTA far right, routed to a `/contact` stub — no real signup flow exists yet.
 Dropdowns on hover/focus, keyboard operable (arrows, Escape), hamburger + accordion on mobile.
@@ -34,7 +34,7 @@ Sticky header, compresses with a border/shadow after ~60px scroll.
 **Home page order:** hero (headline + two CTAs, text-only) → tooling strip (Foundry, Slither,
 Halmos, Z3 — real pipeline tools, not client logos, since there are no named clients yet) →
 code/rule panel (real compiling Solidity `transferFrom` next to the WSL check for it) →
-three feature callouts → two comparison cards (Warden / Security Audits) → footer.
+three feature callouts → two comparison cards (Artemis / Security Audits) → footer.
 
 **Content rules:** no invented clients, testimonials, logos, or certifications. No exclamation
 marks, "revolutionize," "cutting-edge," or em dashes. All copy in typed objects under
@@ -49,7 +49,7 @@ rule-status-honesty principle (below) applied to marketing copy.
 the convention already used in `apps/api` and `workers/orchestrator`. New devDependency, scoped
 to this package.
 
-**Stub-only pages** (header/footer wired, minimal content): Products index, Warden, Scout, Foil,
+**Stub-only pages** (header/footer wired, minimal content): Products index, Artemis, Scout, Foil,
 Security Services index, Audits, Enterprise, Pricing, Blog index, About, Docs, Contact, Terms,
 Privacy.
 
@@ -74,7 +74,7 @@ Privacy.
 
 - Read this file before writing code; check `docs/SCAFFOLDING.md` before resuming phase work.
 - Before any expensive-to-reverse decision (schema shape, finding model, sandbox strategy, the
-  Warden engine choice), stop and give Sophie two or three options with tradeoffs, then wait.
+  Artemis engine choice), stop and give Sophie two or three options with tradeoffs, then wait.
 - Prefer fewer dependencies and less new infrastructure when the choice is close.
 - Never fabricate a finding, a severity, or a tool result. Unimplemented stages return
   `NOT_IMPLEMENTED`, never an empty pass.

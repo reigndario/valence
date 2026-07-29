@@ -1,13 +1,13 @@
 # SCAFFOLDING.md
 > Generated: 2026-07-28
-> Doc schema version: **3.1.0** — see [Revision History](#revision-history) and
+> Doc schema version: **3.1.1** — see [Revision History](#revision-history) and
 > [Versioning Standard](#versioning-standard) below.
 > Project: Valence
 > Stack: pnpm monorepo — Next.js 15 (workbench/portal/marketing, Vercel) / Fastify + TS
 > (api, Railway) / Python (analysis + engines + review workers, Railway) / Postgres + Redis
 > (Railway) / plain SQL migrations via dbmate / Railway Volume for artifact storage. Infra
 > footprint is deliberately just Railway + Vercel + Docker Desktop locally — no AWS, no
-> Cloudflare, including for Warden/Scout/Foil artifacts (counterexamples, traces, mutation
+> Cloudflare, including for Artemis/Scout/Foil artifacts (counterexamples, traces, mutation
 > output, WSL corpora all land on the same Railway Volume).
 > Current state: Phase 0 skeleton and Phase 1 (intake and sandbox) complete and verified.
 > `apps/marketing` (public landing page, jumped the queue ahead of Phase 1) built and
@@ -23,8 +23,9 @@
 |---|---|---|
 | 1.0.0 | 2026-07-28 | Initial scaffold. Task-level checklists for Phase 0 and Phase 1 only; Phases 2–9 listed as one-line "Out of Scope" pointers to `CLAUDE.md`, per the then-standing "no speculative scaffolding for later phases" rule. |
 | 2.0.0 | 2026-07-28 | **Schema change.** `CLAUDE.md`'s working agreement amended: full task-level checklists now drafted for all phases (0–9) up front, so the whole roadmap is visible and versioned from day one. Added the item-ID scheme and status legend below for enterprise-style cross-referencing (commits/PRs can cite `P4-07`, etc.). Execution discipline is unchanged — one phase worked at a time, later checklists revised as their turn comes. |
-| 3.0.0 | 2026-07-28 | **Structural change**, mirroring `CLAUDE.md`'s product-direction update. Warden (formal verification), Scout (an AI agent), and Foil (mutation testing) are added as priority phases alongside the existing pre-audit business, inside the existing architecture — no app/package rename. A new **"marketing funnel UI v1"** phase is inserted as **Phase 2** (workbench shell, the full triage-queue interaction set, the self-serve trial flow, and a permanent shareable public report URL), pulling UI ahead of further backend depth on purpose. Phases 2–9 are renumbered to 2–11 to make room; old Phase 7 (LLM review pipeline) is absorbed into new Phase 6 (Scout) — same evidence-gate design, wider job, not a separate track. **Item-ID remapping:** old `P2-*` (analysis battery) → new `P3-*`; old `P3-*` (triage workbench) → folded into new `P2-*`; old `P4-*` (report generation) → unchanged, still `P4-*`; old `P5-*` (client portal) → new `P8-*`; old `P6-*` (property testing) → new `P9-*`; old `P7-*` (LLM review) → folded into new `P6-*` (Scout); old `P8-*` (CI) → new `P10-*`; old `P9-*` (commercial) → new `P11-*`. This remapping is safe under the ID-stability rule below because none of the reassigned items had been started, checked off, or cited in a merged PR — only `P0-*`/`P1-*` carry real history, and those are untouched. |
+| 3.0.0 | 2026-07-28 | **Structural change**, mirroring `CLAUDE.md`'s product-direction update. Artemis (formal verification), Scout (an AI agent), and Foil (mutation testing) are added as priority phases alongside the existing pre-audit business, inside the existing architecture — no app/package rename. A new **"marketing funnel UI v1"** phase is inserted as **Phase 2** (workbench shell, the full triage-queue interaction set, the self-serve trial flow, and a permanent shareable public report URL), pulling UI ahead of further backend depth on purpose. Phases 2–9 are renumbered to 2–11 to make room; old Phase 7 (LLM review pipeline) is absorbed into new Phase 6 (Scout) — same evidence-gate design, wider job, not a separate track. **Item-ID remapping:** old `P2-*` (analysis battery) → new `P3-*`; old `P3-*` (triage workbench) → folded into new `P2-*`; old `P4-*` (report generation) → unchanged, still `P4-*`; old `P5-*` (client portal) → new `P8-*`; old `P6-*` (property testing) → new `P9-*`; old `P7-*` (LLM review) → folded into new `P6-*` (Scout); old `P8-*` (CI) → new `P10-*`; old `P9-*` (commercial) → new `P11-*`. This remapping is safe under the ID-stability rule below because none of the reassigned items had been started, checked off, or cited in a merged PR — only `P0-*`/`P1-*` carry real history, and those are untouched. |
 | 3.1.0 | 2026-07-29 | **Phase 2 status change** (Next → In Progress) plus resolution of both items' blocking decisions. **P2-08 (workbench auth):** Next.js middleware in `apps/workbench` gates every route behind a shared-secret cookie except an explicit allowlist (`/trial`, `/report/[id]`), which stay open. Chosen over re-enabling Vercel Deployment Protection because that gate is deployment-wide and would also block the public trial/report pages, and over splitting the public surface into a separate app because `CLAUDE.md` calls for `apps/workbench` to stay the single internal surface. **P2-12 (public report default):** no default — every run (trial or engagement) starts private; making a report URL public requires an explicit, logged per-run action. Chosen as the more conservative of the options `CLAUDE.md` raised, given how existential the confidentiality constraint is; this closes the "raise with Sophie" item in `CLAUDE.md`'s decision list. |
+| 3.1.1 | 2026-07-29 | **Rename, no scope/status change.** The Warden product is renamed to **Artemis** throughout `CLAUDE.md`, this file, `docs/BUILD_PLAN.md`, and `apps/marketing`/`apps/workbench` (nav label and route `/products/warden` → `/products/artemis`, page component, content exports, test assertions, the synthetic-findings tool list). `packages/wsl` and the `.wsl` rule-file extension are unaffected — WSL is the rule language's own name, not derived from the product name. `CHANGELOG.md`'s already-written entries are left as historical record of what shipped under the old name; a new entry documents the rename itself. |
 
 ---
 
@@ -70,14 +71,14 @@ Valence is a Web3 security firm. The near-term product is a triage workbench for
 the readiness review a protocol runs before (or instead of) a paid security audit — letting one
 auditor run a battery of analysis tools against a client's Solidity repo, dedupe and suppress
 the noise, and produce a defensible readiness report. Layered inside that same workbench, and
-now the priority build target, is Warden/Scout/Foil: a formal-verification engine, an AI agent
+now the priority build target, is Artemis/Scout/Foil: a formal-verification engine, an AI agent
 that infers intent and writes verification rules for it, and a mutation-testing tool that
 scores whether those rules actually catch anything — the same three-product shape as Certora's
 Prover/AutoProver/Gambit lineup, EVM-only for v1. Full spec lives in
 [`CLAUDE.md`](../CLAUDE.md).
 
 **Inferred intent:** Build the internal auditor workbench first, but treat its UI as a
-marketing funnel too — every non-confidential Warden/Scout/Foil run gets a permanent, shareable
+marketing funnel too — every non-confidential Artemis/Scout/Foil run gets a permanent, shareable
 report URL, because a real proof result on a real repo sells the product better than a landing
 page. This is a deliberate, explicit amendment to "workbench before client portal," scoped to
 the automated-engine product line only; client-engagement work stays private by default.
@@ -95,23 +96,23 @@ not inferred from code.
 | Local compose stack | ✅ Done | Postgres 16 + Redis 7 via `infra/docker-compose.yml`, both with real healthchecks |
 | Migrations | ✅ Done | `dbmate`; bootstrap migration (`pgcrypto`) plus Phase 1's `engagements` table |
 | `apps/api` health path | ✅ Done | `GET /health` checks live Postgres + Redis connectivity, not just process liveness |
-| `apps/workbench` | 🔧 Partial | Shared-secret middleware auth gate (P2-08) with `/trial` and `/report/[id]` allowlisted public; engagement list (`/`) and engagement detail with run history and a live SSE log viewer (`/engagements/[id]`) done (P2-01, P2-02). Triage queue, trial flow, and report page still to come |
+| `apps/workbench` | 🔧 Partial | Shared-secret middleware auth gate (P2-08) with `/trial` and `/report/[id]` allowlisted public; engagement list (`/`) and engagement detail with run history and a live SSE log viewer (`/engagements/[id]`) done (P2-01, P2-02); triage queue list view (`/triage`) done, seeded with 100 synthetic findings (P2-03). Triage actions, trial flow, and report page still to come |
 | CI | ✅ Done | GitHub Actions; now also runs `workers/orchestrator`'s Docker-backed sandbox test |
 | Lint | ❌ Missing | `eslint`/`next lint` were never wired up in Phase 0; both scripts now fail loudly and honestly rather than silently no-op |
 | Tests | ✅ Done | `apps/api`: health, engagement intake, SSE log streaming (all against a real DB/Redis). `workers/orchestrator`: hardened-container wall-clock kill, and the Phase 1 acceptance test (real clone + hardened build + determinism check against a real public repo). No test infra yet for Python workers (don't exist yet) |
 | Git repository | ✅ Done | `github.com/reigndario/valence`, Phase 0 merged to `main` via PR #1, sandbox-strategy decision doc merged via PR #2, Phase 1 merged via PR #3 |
 | Vercel deployment | 🔧 Partial | `apps/workbench` project created; Deployment Protection currently disabled per Sophie's call (see `CLAUDE.md` note) |
-| `apps/marketing` | ✅ Done | Multi-page public site (home, Products/Warden/Scout/Foil, Security Services/Audits/Enterprise/Pricing, Blog, About, Docs, Contact, Terms, Privacy) with a keyboard-operable nav, builds and typechecks clean, not yet deployed to its own Vercel project |
+| `apps/marketing` | ✅ Done | Multi-page public site (home, Products/Artemis/Scout/Foil, Security Services/Audits/Enterprise/Pricing, Blog, About, Docs, Contact, Terms, Privacy) with a keyboard-operable nav, builds and typechecks clean, not yet deployed to its own Vercel project |
 | `apps/portal` | ⏸ Not Started | Phase 8 |
 | `apps/api` product routes | 🔧 Partial | Engagement intake (`POST`/`GET /engagements`, `GET /engagements/:id`), SSE log streaming (`GET /engagements/:id/logs`), and run listing (`GET /engagements/:id/runs`, backed by the new `runs` table) done; auth, orgs, findings still to come |
 | `packages/findings`, `packages/report` | ⏸ Not Started | Phase 3 (`findings`), Phase 4 (`report`) |
 | `packages/sdk`, `packages/cli` | ⏸ Not Started | Not yet scheduled to a specific phase |
-| `packages/wsl`, `packages/wsl-compiler`, `packages/trace` | ⏸ Not Started | Phase 5 (Warden) |
+| `packages/wsl`, `packages/wsl-compiler`, `packages/trace` | ⏸ Not Started | Phase 5 (Artemis) |
 | `packages/scout-agent` | ⏸ Not Started | Phase 6 (Scout) |
 | `packages/foil` | ⏸ Not Started | Phase 7 (Foil) |
 | `workers/orchestrator` | ✅ Done | BullMQ consumer + the full Phase 1 sandbox pipeline (clone, hardened build, determinism check, artifact persistence) |
 | `workers/analysis` | ⏸ Not Started | Phase 3 |
-| `workers/engines` | ⏸ Not Started | Phase 5 (Warden) — verification engine adapters, solver pool management |
+| `workers/engines` | ⏸ Not Started | Phase 5 (Artemis) — verification engine adapters, solver pool management |
 | `workers/review` | ⏸ Not Started | Phase 6 (Scout) — retrieval and proposal generation |
 | Sandboxed build execution | ✅ Done | Hardened Docker (runc): read-only rootfs, tmpfs workspace, dropped caps, seccomp, no-new-privileges, network cut after dependency fetch, memory/CPU caps, wall-clock kill — see Phase 1 below |
 | `corpus/` | ⏸ Not Started | Phase 6 (Scout) |
@@ -128,12 +129,12 @@ not inferred from code.
 | 2 | Marketing funnel UI v1 | 🔧 In Progress | Public trial flow on a real repo gets a no-login, CTA'd report URL; 100 synthetic findings triaged in under an hour |
 | 3 | Analysis battery v1 | ⏸ Not started | Run on a repo with known issues produces a deduped finding set; re-running with suppressions applied is quieter |
 | 4 | Report generation | ⏸ Not started | Produce a report on a public repo defensible enough to send a paying client |
-| 5 | Warden v1 | ⏸ Not started | Correct ERC20 proves; broken `transferFrom` returns `VIOLATED` with a correct call trace; unbounded loop returns `UNKNOWN` with a stated reason |
+| 5 | Artemis v1 | ⏸ Not started | Correct ERC20 proves; broken `transferFrom` returns `VIOLATED` with a correct call trace; unbounded loop returns `UNKNOWN` with a stated reason |
 | 6 | Scout v1 | ⏸ Not started | Point it at a real small protocol with no spec — produces a working rule set plus a bug-hunting finding, retries an `UNKNOWN` before surfacing it |
 | 7 | Foil v1 | ⏸ Not started | A vacuous spec is flagged by a surviving mutant that names the exact hole |
 | 8 | Client portal and remediation loop | ⏸ Not started | Re-run against a fix commit, diff findings, verify each claimed fix, issue a delta report |
 | 9 | Property testing and invariants | ⏸ Not started | Extract invariants for a real protocol, run them, report which hold under fuzzing |
-| 10 | CI and continuous mode | ⏸ Not started | GitHub App posts checks per commit, gated against last accepted baseline, for findings and Warden/Scout rules alike |
+| 10 | CI and continuous mode | ⏸ Not started | GitHub App posts checks per commit, gated against last accepted baseline, for findings and Artemis/Scout rules alike |
 | 11 | Commercial | ⏸ Not started | Multi-tenant orgs, per-engagement pricing/quotas, Stripe, RBAC, access logging |
 
 Mirrored in [`docs/BUILD_PLAN.md`](./BUILD_PLAN.md), which is the lighter-weight status-only
@@ -214,7 +215,7 @@ streamed logs, artifact persistence.
 > deliberately not a host bind-mount: Solidity build output legitimately contains
 > case-colliding sibling paths (`out/Test.sol` vs `out/test.sol`), which breaks on a
 > case-insensitive host filesystem (macOS/Docker Desktop) but not on the named volume's real
-> Linux filesystem. This same volume, same reasoning, now also holds Warden/Scout/Foil
+> Linux filesystem. This same volume, same reasoning, now also holds Artemis/Scout/Foil
 > artifacts (counterexamples, traces, mutation output) once those phases exist — do not reopen
 > the storage decision for them.
 
@@ -271,8 +272,13 @@ under an hour, to prove the queue interactions are fast enough once Phase 3 supp
 - [x] **P2-02** Wire the log viewer to Phase 1's SSE log stream. Verified end-to-end manually
       (Redis `PUBLISH` on `valence:logs:engagement:*` → SSE `data:` event → parsed by the
       client `LogViewer` component), not just typechecked.
-- [ ] **P2-03** Build the triage queue list view, seeded with synthetic/mock findings for
-      interaction testing until Phase 3 supplies real ones
+- [x] **P2-03** Built the triage queue list view (`apps/workbench/app/triage/page.tsx`), seeded
+      with 100 deterministically-generated synthetic findings (`apps/workbench/lib/findings.ts`,
+      fixed-seed `mulberry32` PRNG so the set is stable across reloads — needed for the P2-15
+      timed-triage acceptance test to be repeatable). Severity is a placeholder 4-level enum,
+      not the real severity model (that's still an open decision blocking Phase 3). Linked from
+      the engagement list (`/`) via a "Triage queue →" nav link. No promote/demote/merge
+      actions yet — that's P2-04.
 - [ ] **P2-04** Implement keyboard shortcuts for promote / demote / merge / set-severity
 - [ ] **P2-05** Build the finding detail view: code span rendering, linked reproduction/test
       placeholder
@@ -369,7 +375,7 @@ paying client.
       external call surface, dependency versions, inheritance depth)
 - [ ] **P4-04** Build the coverage/test-gap report section from Phase 3's coverage adapter data
 - [ ] **P4-05** Build the invariant-inventory section (placeholder structure; fully populated
-      once Phase 5's Warden rules and Phase 9's property-testing campaigns exist)
+      once Phase 5's Artemis rules and Phase 9's property-testing campaigns exist)
 - [ ] **P4-06** Implement PDF rendering from the markdown source
 - [ ] **P4-07** Implement HTML rendering from the markdown source
 - [ ] **P4-08** Enforce the mandatory "readiness review, not a substitute for a security audit"
@@ -381,7 +387,7 @@ paying client.
 
 ---
 
-## Phase 5: Warden v1 — ⏸ Not Started
+## Phase 5: Artemis v1 — ⏸ Not Started
 
 **Goal:** Compile WSL to a verification IR, emit an engine harness, dispatch to the chosen
 verification engine, return the four-state result (`PROVED`/`VIOLATED`/`UNKNOWN`/`ERROR`) with
@@ -397,7 +403,7 @@ engine decision below has to be resolved before most of this phase can start.
 - [ ] **P5-01** ⛔ Resolve the engine decision with Sophie (Option A: orchestrate open-source
       engines — Halmos, hevm, SMTChecker; Option B: fork the Certora Prover, GPLv3 copyleft
       risk; Option C: build a VC generator + solver-portfolio dispatch) — blocks every other
-      item in this phase, see `CLAUDE.md`'s Warden section for full tradeoffs
+      item in this phase, see `CLAUDE.md`'s Artemis section for full tradeoffs
 - [ ] **P5-02** Build `packages/wsl`: lexer, parser, AST
 - [ ] **P5-03** Build the WSL typechecker against contract ABIs
 - [ ] **P5-04** Build the WSL formatter (must be idempotent)
@@ -417,7 +423,7 @@ engine decision below has to be resolved before most of this phase can start.
       machine-readable reason, never rendered green
 - [ ] **P5-13** Implement run determinism: pin solc/engine/solver versions plus a seed,
       content-hash the input tree
-- [ ] **P5-14** Wire Warden run results into Phase 2's public report page and Phase 4's
+- [ ] **P5-14** Wire Artemis run results into Phase 2's public report page and Phase 4's
       invariant-inventory section
 - [ ] **P5-15** Acceptance test: correct ERC20 proves; deliberately broken `transferFrom`
       returns `VIOLATED` with a correct call trace; unbounded loop returns `UNKNOWN` with a
@@ -428,10 +434,10 @@ engine decision below has to be resolved before most of this phase can start.
 ## Phase 6: Scout v1 — ⏸ Not Started
 
 **Goal:** Intent inference from code and docs, WSL rule generation from that intent (dispatched
-through Warden), a separate bug-hunting pass, a retry-on-failure loop, a three-part report.
+through Artemis), a separate bug-hunting pass, a retry-on-failure loop, a three-part report.
 Absorbs what was previously scoped as the standalone "LLM review pipeline" — same evidence-gate
 principle, wider job, not a separate track.
-**Depends on:** Phase 5 (Warden) complete — Scout writes ordinary Warden rules, not a separate
+**Depends on:** Phase 5 (Artemis) complete — Scout writes ordinary Artemis rules, not a separate
 result type.
 **Estimated scope:** Large — the confidentiality and evidence-gate requirements make this the
 highest-stakes phase in the plan.
@@ -483,7 +489,7 @@ it demonstrably retries with a revised approach before surfacing the failure.
 
 **Goal:** Mutant generation over the source, a campaign runner against the WSL rule suite, a
 survivor report, and a mutation-score dashboard in the workbench.
-**Depends on:** Phase 5 (Warden) complete — Foil mutates against the WSL rule suite Warden
+**Depends on:** Phase 5 (Artemis) complete — Foil mutates against the WSL rule suite Artemis
 executes.
 **Estimated scope:** Medium-large.
 **Acceptance test:** a vacuous spec is flagged by a surviving mutant that names the exact hole.
@@ -491,7 +497,7 @@ executes.
 ### Checklist
 
 - [ ] **P7-01** Build `packages/foil`: semantic mutant generator over Solidity source
-- [ ] **P7-02** Build the campaign runner: rerun the WSL rule suite (via Warden) against each
+- [ ] **P7-02** Build the campaign runner: rerun the WSL rule suite (via Artemis) against each
       mutant
 - [ ] **P7-03** Implement survivor detection: a mutant that survives means no rule caught it
 - [ ] **P7-04** Build the survivor report, naming the exact hole (which rule or code path went
@@ -538,7 +544,7 @@ a delta report.
 ## Phase 9: Property Testing and Invariants — ⏸ Not Started
 
 **Goal:** Invariant inventory as a first-class object. ABI-driven handler generation, Medusa or
-Echidna campaigns, halmos standard property sets — complementary to Phase 5's Warden proofs
+Echidna campaigns, halmos standard property sets — complementary to Phase 5's Artemis proofs
 rather than duplicating them: fuzzing catches what an unbounded WSL rule can't afford to check
 exhaustively, and vice versa.
 **Depends on:** Phase 3 complete (needs the finding/contract model); can run in parallel with
@@ -561,7 +567,7 @@ fuzzing and which are unproven.
 - [ ] **P9-07** Label every bounded check explicitly as bounded, with the bound stated in the
       report — do not oversell
 - [ ] **P9-08** Wire invariant results into Phase 4's report invariant-inventory section,
-      alongside Phase 5's Warden rule results
+      alongside Phase 5's Artemis rule results
 - [ ] **P9-09** Acceptance test: extract invariants for a real protocol, run under fuzzing,
       report hold/unproven status
 
@@ -570,7 +576,7 @@ fuzzing and which are unproven.
 ## Phase 10: CI and Continuous Mode — ⏸ Not Started
 
 **Goal:** GitHub App posting checks per commit, regression gating against the last accepted
-baseline — for static-analysis findings and Warden/Scout rule results alike. The
+baseline — for static-analysis findings and Artemis/Scout rule results alike. The
 recurring-revenue product: a pre-audit is one-off, continuous monitoring between audits is a
 subscription.
 **Depends on:** Phase 8 complete (reuses the diff/verification logic from the remediation
@@ -585,7 +591,7 @@ last accepted baseline.
 - [ ] **P10-02** Implement per-commit check-run creation, posted back to the GitHub PR
 - [ ] **P10-03** Implement regression gating against the last accepted baseline for
       static-analysis findings, reusing Phase 8's diff logic
-- [ ] **P10-04** Implement regression gating against the last accepted baseline for Warden/
+- [ ] **P10-04** Implement regression gating against the last accepted baseline for Artemis/
       Scout rule results specifically (a rule that used to prove and now doesn't is a
       regression even with zero new findings)
 - [ ] **P10-05** Implement subscription-tier scoping for continuous mode, distinct from a
@@ -623,7 +629,7 @@ quota enforcement works end to end.
 Tracked so they don't get decided by default inertia. Full list with phase mapping in
 [`docs/BUILD_PLAN.md`](./BUILD_PLAN.md#pending-decisions-blocking-future-phases):
 
-- The Warden engine decision — Option A (orchestrate open-source engines) vs. B (fork Certora
+- The Artemis engine decision — Option A (orchestrate open-source engines) vs. B (fork Certora
   Prover, GPLv3) vs. C (build a VC generator + solver portfolio) (blocks **P5-01**)
 - Whether WSL aims for source compatibility with CVL — helps adoption, real legal/design
   constraint to weigh first (blocks the detailed design of **P5-02**–**P5-04**)
