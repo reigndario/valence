@@ -1,9 +1,17 @@
 import Link from "next/link";
-import { navGroups, socialLinks, legalLinks } from "../../content/nav";
+import { productLinks, menuGroups, docsLink, dollarLink, socialLinks, legalLinks } from "../../content/nav";
 import { GithubIcon, TwitterIcon, LinkedinIcon } from "../icons";
 import styles from "./Footer.module.css";
 
 const socialIcons = { github: GithubIcon, twitter: TwitterIcon, linkedin: LinkedinIcon };
+
+// Mirrors the header: product tabs get their own column, everything behind
+// the hamburger menu gets its own.
+const footerColumns = [
+  { label: "Products", links: productLinks },
+  ...menuGroups,
+  { label: "More", links: [docsLink, dollarLink] },
+];
 
 export default function Footer() {
   return (
@@ -15,7 +23,7 @@ export default function Footer() {
           </Link>
 
           <div className={styles.columns}>
-            {navGroups.map((group) => (
+            {footerColumns.map((group) => (
               <div key={group.label} className={styles.column}>
                 <p className={styles.columnTitle}>{group.label}</p>
                 <ul>

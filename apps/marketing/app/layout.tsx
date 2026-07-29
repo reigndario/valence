@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Instrument_Serif } from "next/font/google";
+import { Instrument_Serif, IBM_Plex_Mono, Space_Grotesk, Fraunces } from "next/font/google";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import "./globals.css";
@@ -8,6 +8,27 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-instrument-serif",
+});
+
+// One distinct font per product tab, so each reads as its own identity rather
+// than three items in a uniform list.
+const artemisFont = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: "600",
+  variable: "--font-artemis",
+});
+
+const scoutFont = Space_Grotesk({
+  subsets: ["latin"],
+  weight: "600",
+  variable: "--font-scout",
+});
+
+const foilFont = Fraunces({
+  subsets: ["latin"],
+  weight: "600",
+  style: "italic",
+  variable: "--font-foil",
 });
 
 export const metadata = {
@@ -20,7 +41,11 @@ const themeInitScript = `(function(){try{var t=localStorage.getItem("theme");if(
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={instrumentSerif.variable} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${instrumentSerif.variable} ${artemisFont.variable} ${scoutFont.variable} ${foilFont.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

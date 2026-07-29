@@ -9,30 +9,23 @@ export type NavGroup = {
   links: NavLink[];
 };
 
-export const navGroups: NavGroup[] = [
-  {
-    label: "Products",
-    links: [
-      { label: "Artemis", href: "/products/artemis", description: "Formal verification for your invariants." },
-      { label: "Scout", href: "/products/scout", description: "An AI agent that infers intent and hunts bugs." },
-      { label: "Foil", href: "/products/foil", description: "Mutation testing for your test suite." },
-    ],
-  },
-  {
-    label: "Security Services",
-    links: [
-      { label: "Security Audits", href: "/security-services/audits", description: "A dedicated team for a full engagement." },
-      { label: "Enterprise", href: "/security-services/enterprise", description: "Ongoing coverage across a portfolio of contracts." },
-      { label: "Pricing", href: "/security-services/pricing" },
-    ],
-  },
-  {
-    label: "Community",
-    links: [{ label: "Blog", href: "/blog", description: "Notes on formal verification and audit practice." }],
-  },
+// The 3 product tabs are prominent, always-visible top-level links — not grouped
+// under a dropdown. Order matters: rendered left to right in this order.
+export const productLinks: NavLink[] = [
+  { label: "Artemis", href: "/products/artemis", description: "Formal verification for your invariants." },
+  { label: "Scout", href: "/products/scout", description: "An AI agent that infers intent and hunts bugs." },
+  { label: "Foil", href: "/products/foil", description: "Mutation testing for your test suite." },
+];
+
+// Everything else lives behind the hamburger menu, at every screen size —
+// there is no separate desktop mega-menu anymore.
+export const menuGroups: NavGroup[] = [
   {
     label: "Company",
-    links: [{ label: "About", href: "/about", description: "Who we are and why we started Valence." }],
+    links: [
+      { label: "About", href: "/about", description: "Who we are and why we started Valence." },
+      { label: "Security Services", href: "/security-services", description: "Audits, Enterprise coverage, and pricing." },
+    ],
   },
 ];
 

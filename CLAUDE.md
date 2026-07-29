@@ -13,10 +13,9 @@ Full business context, architecture, and the phase-by-phase build plan are versi
 ## Current work
 
 `apps/marketing` (Next.js 15 App Router, plain CSS, no framework) is now a multi-page site,
-rebuilt from its original single static page onto Certora's structural pattern (top nav with
-mega-menu dropdowns, hero, logo/tooling strip, two-pane code/rule panel, feature callouts,
-comparison cards, footer mirroring the nav) with Valence's own warm palette instead of Certora's
-dark one.
+rebuilt from its original single static page onto Certora's structural pattern (top nav, hero,
+logo/tooling strip, two-pane code/rule panel, feature callouts, comparison cards, footer
+mirroring the nav) with Valence's own warm palette instead of Certora's dark one.
 
 **Palette** (`apps/marketing/app/globals.css` custom properties):
 - Background `#FAF7F5`, text `#2B2A2E`, card surfaces white with `#E8E1DC` hairline borders, no
@@ -25,11 +24,16 @@ dark one.
   `#F3C9B2`. Buttons use dark charcoal text on the pastel fill, never white-on-pastel.
 - Code panels are the one deliberate contrast point: dark slate `#22242B` with light text.
 
-**Nav:** Products (Artemis/Scout/Foil, one-line descriptions each) · Security Services (Security
-Audits, Enterprise, Pricing) · Community (Blog) · Company (About) · standalone Docs link. Social
-icons + primary CTA far right, routed to a `/contact` stub — no real signup flow exists yet.
-Dropdowns on hover/focus, keyboard operable (arrows, Escape), hamburger + accordion on mobile.
-Sticky header, compresses with a border/shadow after ~60px scroll.
+**Nav:** Artemis, Scout, and Foil are prominent standalone top-level tabs, not grouped under a
+"Products" dropdown — each gets its own distinct font (`app/layout.tsx`'s font loads:
+IBM Plex Mono / Space Grotesk / Fraunces italic) so each product reads as its own identity.
+`$0.99` sits alongside them, unchanged. Everything else lives behind a hamburger menu shown at
+every screen width, not just mobile: a Company accordion (About, Security Services — Security
+Services' own sub-pages, Audits/Enterprise/Pricing, are linked from the Security Services index
+page itself, not the nav) plus a standalone Docs link. No Community tab (removed, along with the
+Blog page). Social icons + primary CTA stay visible in the header bar outside the hamburger,
+routed to a `/contact` stub — no real signup flow exists yet. Sticky header, compresses with a
+border/shadow after ~60px scroll.
 
 **Home page order:** hero (headline + two CTAs, text-only) → tooling strip (Foundry, Slither,
 Halmos, Z3 — real pipeline tools, not client logos, since there are no named clients yet) →
@@ -49,9 +53,9 @@ rule-status-honesty principle (below) applied to marketing copy.
 the convention already used in `apps/api` and `workers/orchestrator`. New devDependency, scoped
 to this package.
 
-**Stub-only pages** (header/footer wired, minimal content): Products index, Artemis, Scout, Foil,
-Security Services index, Audits, Enterprise, Pricing, Blog index, About, Docs, Contact, Terms,
-Privacy.
+**Stub-only pages** (header/footer wired, minimal content): Artemis, Scout, Foil, Security
+Services index (links to Audits, Enterprise, Pricing), Audits, Enterprise, Pricing, About, Docs,
+Contact, Terms, Privacy.
 
 ## Hard constraints (do not relax without Sophie's sign-off)
 
