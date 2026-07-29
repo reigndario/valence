@@ -6,7 +6,8 @@ export default function Hero() {
   return (
     <section className={styles.heroSection}>
       <div className={styles.heroBackground} aria-hidden="true">
-        <div className={styles.heroRing} />
+        <div className={styles.heroRingA} />
+        <div className={styles.heroRingB} />
       </div>
 
       <div className={`wrap ${styles.hero}`}>
