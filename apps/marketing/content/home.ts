@@ -1,5 +1,5 @@
 export const hero = {
-  headline: "Secure your smart contracts with formal verification and expert audits.",
+  headline: "Security that bonds to your code.",
   primaryCta: { label: "Get started free", href: "/contact" },
   secondaryCta: { label: "Request an audit", href: "/security-services/audits" },
 };
