@@ -83,6 +83,15 @@ traces, mutation campaign output, and WSL corpora land on the same Railway Volum
 S3-compatible bucket. Do not reopen this for the new product line; it's the same tradeoff for
 the same reason.
 
+**Workbench auth and public-report defaults (Phase 2):** `apps/workbench` mixes private pages
+(triage queue, engagement list) with public ones (the self-serve trial flow, shareable report
+URLs) in the same app, so Vercel's deployment-wide Standard Protection can't gate one without
+blocking the other. Auth is a Next.js middleware in `apps/workbench` checking a shared-secret
+cookie on every route except an explicit allowlist (`/trial`, `/report/[id]`). Separately, no
+run is public by default — trial and engagement runs alike start private, and making a report
+URL shareable requires an explicit, logged per-run action. Both decided 2026-07-29; do not
+re-litigate without cause.
+
 **Costs (only two things actually bill so far):** Railway (Postgres + Redis + api + volume,
 running continuously — the main bill-driver) and Vercel (the Hobby/free plan's terms exclude
 commercial use, so a paid plan is expected once this is a live business tool, not a nice-to-
@@ -429,10 +438,6 @@ send code externally) is a "raise with Sophie" item below, not decided here.
 - Whether Scout's model calls run through a hosted provider or something self-hostable, for
   enterprise clients who will not send code externally — this one matters a lot for that pitch
   specifically, and it is a sharper version of the existing hosted-LLM question below.
-- Whether the self-serve trial flow's "public by default for non-client runs" framing (Phase 2)
-  is the right default, or whether every public report should require an explicit per-run
-  opt-in with no default at all, given how existential the confidentiality constraint is for
-  the audit side of the business.
 - Whether the first paying engagements are run entirely by hand while the workbench is built
   (almost certainly correct, but changes the phase order).
 - Severity model: adopt the impact-times-likelihood matrix Code4rena and Sherlock use (so

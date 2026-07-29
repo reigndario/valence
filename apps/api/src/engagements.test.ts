@@ -61,4 +61,22 @@ describe("engagement intake", () => {
     });
     expect(res.statusCode).toBe(404);
   });
+
+  it("lists engagements, newest first", async () => {
+    const createRes = await app.inject({
+      method: "POST",
+      url: "/engagements",
+      payload: {
+        repoUrl: "https://github.com/foundry-rs/forge-template",
+        commitSha: "f5db6aeeff588c8a789b6f7da83313950fd97178",
+      },
+    });
+    const created = createRes.json();
+
+    const listRes = await app.inject({ method: "GET", url: "/engagements" });
+    expect(listRes.statusCode).toBe(200);
+    const list = listRes.json();
+    expect(Array.isArray(list)).toBe(true);
+    expect(list.some((e: { id: string }) => e.id === created.id)).toBe(true);
+  });
 });

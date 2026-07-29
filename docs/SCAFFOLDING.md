@@ -1,6 +1,6 @@
 # SCAFFOLDING.md
 > Generated: 2026-07-28
-> Doc schema version: **3.0.0** — see [Revision History](#revision-history) and
+> Doc schema version: **3.1.0** — see [Revision History](#revision-history) and
 > [Versioning Standard](#versioning-standard) below.
 > Project: Valence
 > Stack: pnpm monorepo — Next.js 15 (workbench/portal/marketing, Vercel) / Fastify + TS
@@ -11,7 +11,9 @@
 > output, WSL corpora all land on the same Railway Volume).
 > Current state: Phase 0 skeleton and Phase 1 (intake and sandbox) complete and verified.
 > `apps/marketing` (public landing page, jumped the queue ahead of Phase 1) built and
-> verified, not yet deployed. Phase 2 (marketing funnel UI v1) is next.
+> verified, not yet deployed. Phase 2 (marketing funnel UI v1) is in progress — P2-08 and
+> P2-12's blocking decisions are resolved (see Revision History), unblocking the rest of the
+> phase.
 
 ---
 
@@ -22,6 +24,7 @@
 | 1.0.0 | 2026-07-28 | Initial scaffold. Task-level checklists for Phase 0 and Phase 1 only; Phases 2–9 listed as one-line "Out of Scope" pointers to `CLAUDE.md`, per the then-standing "no speculative scaffolding for later phases" rule. |
 | 2.0.0 | 2026-07-28 | **Schema change.** `CLAUDE.md`'s working agreement amended: full task-level checklists now drafted for all phases (0–9) up front, so the whole roadmap is visible and versioned from day one. Added the item-ID scheme and status legend below for enterprise-style cross-referencing (commits/PRs can cite `P4-07`, etc.). Execution discipline is unchanged — one phase worked at a time, later checklists revised as their turn comes. |
 | 3.0.0 | 2026-07-28 | **Structural change**, mirroring `CLAUDE.md`'s product-direction update. Warden (formal verification), Scout (an AI agent), and Foil (mutation testing) are added as priority phases alongside the existing pre-audit business, inside the existing architecture — no app/package rename. A new **"marketing funnel UI v1"** phase is inserted as **Phase 2** (workbench shell, the full triage-queue interaction set, the self-serve trial flow, and a permanent shareable public report URL), pulling UI ahead of further backend depth on purpose. Phases 2–9 are renumbered to 2–11 to make room; old Phase 7 (LLM review pipeline) is absorbed into new Phase 6 (Scout) — same evidence-gate design, wider job, not a separate track. **Item-ID remapping:** old `P2-*` (analysis battery) → new `P3-*`; old `P3-*` (triage workbench) → folded into new `P2-*`; old `P4-*` (report generation) → unchanged, still `P4-*`; old `P5-*` (client portal) → new `P8-*`; old `P6-*` (property testing) → new `P9-*`; old `P7-*` (LLM review) → folded into new `P6-*` (Scout); old `P8-*` (CI) → new `P10-*`; old `P9-*` (commercial) → new `P11-*`. This remapping is safe under the ID-stability rule below because none of the reassigned items had been started, checked off, or cited in a merged PR — only `P0-*`/`P1-*` carry real history, and those are untouched. |
+| 3.1.0 | 2026-07-29 | **Phase 2 status change** (Next → In Progress) plus resolution of both items' blocking decisions. **P2-08 (workbench auth):** Next.js middleware in `apps/workbench` gates every route behind a shared-secret cookie except an explicit allowlist (`/trial`, `/report/[id]`), which stay open. Chosen over re-enabling Vercel Deployment Protection because that gate is deployment-wide and would also block the public trial/report pages, and over splitting the public surface into a separate app because `CLAUDE.md` calls for `apps/workbench` to stay the single internal surface. **P2-12 (public report default):** no default — every run (trial or engagement) starts private; making a report URL public requires an explicit, logged per-run action. Chosen as the more conservative of the options `CLAUDE.md` raised, given how existential the confidentiality constraint is; this closes the "raise with Sophie" item in `CLAUDE.md`'s decision list. |
 
 ---
 
@@ -92,7 +95,7 @@ not inferred from code.
 | Local compose stack | ✅ Done | Postgres 16 + Redis 7 via `infra/docker-compose.yml`, both with real healthchecks |
 | Migrations | ✅ Done | `dbmate`; bootstrap migration (`pgcrypto`) plus Phase 1's `engagements` table |
 | `apps/api` health path | ✅ Done | `GET /health` checks live Postgres + Redis connectivity, not just process liveness |
-| `apps/workbench` | 🔧 Partial | One page that server-fetches `apps/api`'s `/health` and renders it — proves the split works, no product UI yet (Phase 2) |
+| `apps/workbench` | 🔧 Partial | Shared-secret middleware auth gate (P2-08) with `/trial` and `/report/[id]` allowlisted public; engagement list (`/`) and engagement detail with run history and a live SSE log viewer (`/engagements/[id]`) done (P2-01, P2-02). Triage queue, trial flow, and report page still to come |
 | CI | ✅ Done | GitHub Actions; now also runs `workers/orchestrator`'s Docker-backed sandbox test |
 | Lint | ❌ Missing | `eslint`/`next lint` were never wired up in Phase 0; both scripts now fail loudly and honestly rather than silently no-op |
 | Tests | ✅ Done | `apps/api`: health, engagement intake, SSE log streaming (all against a real DB/Redis). `workers/orchestrator`: hardened-container wall-clock kill, and the Phase 1 acceptance test (real clone + hardened build + determinism check against a real public repo). No test infra yet for Python workers (don't exist yet) |
@@ -100,7 +103,7 @@ not inferred from code.
 | Vercel deployment | 🔧 Partial | `apps/workbench` project created; Deployment Protection currently disabled per Sophie's call (see `CLAUDE.md` note) |
 | `apps/marketing` | ✅ Done | Single public landing page, builds and typechecks clean, not yet deployed to its own Vercel project |
 | `apps/portal` | ⏸ Not Started | Phase 8 |
-| `apps/api` product routes | 🔧 Partial | Engagement intake (`POST`/`GET /engagements`) and SSE log streaming (`GET /engagements/:id/logs`) done; auth, orgs, findings, runs still to come |
+| `apps/api` product routes | 🔧 Partial | Engagement intake (`POST`/`GET /engagements`, `GET /engagements/:id`), SSE log streaming (`GET /engagements/:id/logs`), and run listing (`GET /engagements/:id/runs`, backed by the new `runs` table) done; auth, orgs, findings still to come |
 | `packages/findings`, `packages/report` | ⏸ Not Started | Phase 3 (`findings`), Phase 4 (`report`) |
 | `packages/sdk`, `packages/cli` | ⏸ Not Started | Not yet scheduled to a specific phase |
 | `packages/wsl`, `packages/wsl-compiler`, `packages/trace` | ⏸ Not Started | Phase 5 (Warden) |
@@ -122,7 +125,7 @@ not inferred from code.
 |---|---|---|---|
 | 0 | Skeleton | ✅ Done — 2026-07-28 | `docker compose up`, `make demo` green |
 | 1 | Intake and sandbox | ✅ Done — 2026-07-28 | Point it at a real public Foundry repo, get a reproducible build and a stored artifact set |
-| 2 | Marketing funnel UI v1 | ▶️ Next | Public trial flow on a real repo gets a no-login, CTA'd report URL; 100 synthetic findings triaged in under an hour |
+| 2 | Marketing funnel UI v1 | 🔧 In Progress | Public trial flow on a real repo gets a no-login, CTA'd report URL; 100 synthetic findings triaged in under an hour |
 | 3 | Analysis battery v1 | ⏸ Not started | Run on a repo with known issues produces a deduped finding set; re-running with suppressions applied is quieter |
 | 4 | Report generation | ⏸ Not started | Produce a report on a public repo defensible enough to send a paying client |
 | 5 | Warden v1 | ⏸ Not started | Correct ERC20 proves; broken `transferFrom` returns `VIOLATED` with a correct call trace; unbounded loop returns `UNKNOWN` with a stated reason |
@@ -239,7 +242,7 @@ streamed logs, artifact persistence.
 
 ---
 
-## Phase 2: Marketing Funnel UI v1 — ▶️ Next
+## Phase 2: Marketing Funnel UI v1 — 🔧 In Progress
 
 **Goal:** The workbench shell (engagement/run list, log viewer) plus the full keyboard-driven
 triage-queue interaction set — promote, demote, merge, set severity, attach span, write
@@ -260,9 +263,14 @@ under an hour, to prove the queue interactions are fast enough once Phase 3 supp
 
 ### Checklist
 
-- [ ] **P2-01** Design the engagement/run list view in `apps/workbench` (Phase 1's engagement +
-      run data as input)
-- [ ] **P2-02** Wire the log viewer to Phase 1's SSE log stream
+- [x] **P2-01** Design the engagement/run list view in `apps/workbench` (Phase 1's engagement +
+      run data as input). Required adding a `runs` table + `GET /engagements` and
+      `GET /engagements/:id/runs` to `apps/api` first — Phase 1 computed a `PipelineResult` but
+      never persisted it anywhere queryable; see the 2026-07-29 migration
+      `20260729120000_runs.sql` and `workers/orchestrator/src/persist-run.ts`.
+- [x] **P2-02** Wire the log viewer to Phase 1's SSE log stream. Verified end-to-end manually
+      (Redis `PUBLISH` on `valence:logs:engagement:*` → SSE `data:` event → parsed by the
+      client `LogViewer` component), not just typechecked.
 - [ ] **P2-03** Build the triage queue list view, seeded with synthetic/mock findings for
       interaction testing until Phase 3 supplies real ones
 - [ ] **P2-04** Implement keyboard shortcuts for promote / demote / merge / set-severity
@@ -271,17 +279,20 @@ under an hour, to prove the queue interactions are fast enough once Phase 3 supp
 - [ ] **P2-06** Build the narrative editor per finding
 - [ ] **P2-07** Add `apps/api` routes for finding mutation (promote/demote/merge/severity/
       narrative) against whatever finding rows exist (synthetic now, real from Phase 3)
-- [ ] **P2-08** ⛔ Decide auth approach for `apps/workbench` sufficient for single-auditor use
-      (currently no application-level auth; Vercel Deployment Protection is off per `CLAUDE.md`)
+- [x] **P2-08** ~~⛔ Decide~~ Auth approach decided (2026-07-29): Next.js middleware in
+      `apps/workbench` gates all routes behind a shared-secret cookie except an explicit
+      allowlist (`/trial`, `/report/[id]`) — see Revision History v3.1.0. Implementation still
+      to build.
 - [ ] **P2-09** Persist triage actions and a per-action audit trail in Postgres
 - [ ] **P2-10** Design and build the self-serve trial flow: submit a public repo URL, enqueue
       against Phase 1's sandbox pipeline, no auth required
 - [ ] **P2-11** Build the public, permanent, shareable report URL page (unauthenticated route),
       rendering whatever Phase 1 produces (build reproducibility, artifact set), styled with a
       clear CTA toward the product
-- [ ] **P2-12** ⛔ Implement the explicit per-run public/shareable opt-in — see decision
-      required below; public must never be a silent default for anything that could be a
-      client engagement
+- [ ] **P2-12** Implement the explicit per-run public/shareable opt-in. Decided (2026-07-29,
+      see Revision History v3.1.0): no public-by-default for any run type — every run starts
+      private, sharing requires an explicit, logged per-run action. Implementation still to
+      build.
 - [ ] **P2-13** Style pass on both surfaces: "fast, not pretty" for the triage queue;
       "convincing, not internal-tool-looking" for the public funnel page
 - [ ] **P2-14** Acceptance test A: run the public trial flow against a real public Foundry repo
@@ -289,10 +300,9 @@ under an hour, to prove the queue interactions are fast enough once Phase 3 supp
 - [ ] **P2-15** Acceptance test B: time a full triage pass of 100 synthetic findings through the
       queue UI, confirm under an hour
 
-> **Decision required (open — raise with Sophie, blocks P2-12):** Whether the self-serve trial
-> flow's "public by default for non-client runs" framing is the right default, or whether every
-> public report should require an explicit per-run opt-in with no default at all, given how
-> existential the confidentiality constraint is for the audit side of the business.
+> **Decided (2026-07-29):** No public-by-default for any run type. Every run — trial or
+> engagement — starts private; making its report URL shareable requires an explicit, logged
+> per-run action. This closes the corresponding "raise with Sophie" item in `CLAUDE.md`.
 
 ---
 

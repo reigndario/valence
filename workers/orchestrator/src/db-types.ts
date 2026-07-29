@@ -1,16 +1,5 @@
 import type { ColumnType, Generated } from "kysely";
 
-export interface EngagementsTable {
-  id: Generated<string>;
-  repo_url: string;
-  commit_sha: string;
-  scope_globs: string[];
-  docs_links: string[];
-  deadline: ColumnType<string | null, string | null, string | null>;
-  created_at: Generated<Date>;
-  updated_at: Generated<Date>;
-}
-
 export interface RunAttemptJson {
   attempt: number;
   exitCode: number | null;
@@ -27,12 +16,12 @@ export interface RunsTable {
   solc_matrix: string[];
   deterministic: boolean | null;
   artifact_volume: string;
-  // See workers/orchestrator's db-types.ts for why insert/update take a JSON string.
+  // pg doesn't auto-serialize JS values for jsonb columns on the way in — insert/update as a
+  // JSON string; select comes back already parsed via pg's built-in jsonb type parser.
   attempts: ColumnType<RunAttemptJson[], string, string>;
   created_at: Generated<Date>;
 }
 
 export interface DB {
-  engagements: EngagementsTable;
   runs: RunsTable;
 }

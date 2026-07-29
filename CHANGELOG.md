@@ -7,6 +7,17 @@ All notable changes to this project are documented here. Format follows
 
 ### Added
 
+- Phase 2 (marketing funnel UI v1), first slice: a shared-secret middleware auth gate in
+  `apps/workbench` (P2-08) that protects every route except an explicit `/trial` +
+  `/report/[id]` allowlist; the engagement list view (`/`); and an engagement detail view with
+  run history and a live SSE-fed log viewer (P2-01, P2-02). Getting there required closing a
+  gap Phase 1 left open — `workers/orchestrator`'s pipeline computed a result per run but never
+  persisted it anywhere queryable — so this also adds a `runs` Postgres table, `apps/api`
+  routes `GET /engagements` and `GET /engagements/:id/runs`, and
+  `workers/orchestrator/src/persist-run.ts` to write each run's result once the pipeline
+  completes. Verified against live dev servers, not just typechecked: the auth redirect, the
+  public allowlist, the login cookie flow, and a Redis `PUBLISH` reaching the browser as a
+  parsed log line end to end.
 - `apps/marketing` — a single public landing page, deploys to its own Vercel project. Jumped
   the queue ahead of Phase 1 to get a live public surface up sooner; doesn't block or get
   blocked by the numbered phase plan.
@@ -25,6 +36,12 @@ All notable changes to this project are documented here. Format follows
 
 ### Changed
 
+- Two Phase 2 decisions resolved per the working agreement's "raise before committing" rule:
+  workbench auth is a Next.js middleware shared-secret cookie (chosen over Vercel Standard
+  Protection, which is deployment-wide and can't leave `/trial`/`/report/[id]` public while
+  gating everything else), and no run is public by default — every run starts private, sharing
+  requires an explicit, logged per-run action. Recorded in `CLAUDE.md`'s "Decisions made"
+  section and `docs/SCAFFOLDING.md`'s v3.1.0 revision-history entry.
 - Product direction: `CLAUDE.md` now prioritizes Warden (formal verification), Scout (an AI
   agent that infers intent and writes verification rules for it), and Foil (mutation testing)
   as the automated engine layer inside the existing `apps/workbench` architecture — no

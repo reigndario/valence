@@ -2,12 +2,14 @@ import Fastify from "fastify";
 import { registerEngagementRoutes } from "./engagements.js";
 import { registerHealthRoute } from "./health.js";
 import { registerLogsRoute } from "./logs.js";
+import { registerRunRoutes } from "./runs.js";
 
 const app = Fastify({ logger: true });
 
 await registerHealthRoute(app);
 await registerEngagementRoutes(app);
 await registerLogsRoute(app);
+await registerRunRoutes(app);
 
 const port = Number(process.env.PORT ?? 8080);
 

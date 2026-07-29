@@ -1,26 +1,39 @@
-type ApiHealth =
-  | { reachable: true; status: number; body: unknown }
-  | { reachable: false; status: null; body: null; error: string };
-
-async function getApiHealth(): Promise<ApiHealth> {
-  const apiUrl = process.env.VALENCE_API_URL ?? "http://localhost:8080";
-
-  try {
-    const res = await fetch(`${apiUrl}/health`, { cache: "no-store" });
-    return { reachable: true, status: res.status, body: await res.json() };
-  } catch (err) {
-    return { reachable: false, status: null, body: null, error: (err as Error).message };
-  }
-}
+import Link from "next/link";
+import { listEngagements } from "../lib/api";
 
 export default async function Home() {
-  const health = await getApiHealth();
+  const engagements = await listEngagements();
 
   return (
     <main style={{ fontFamily: "monospace", padding: "2rem" }}>
       <h1>Valence Workbench</h1>
-      <p>Phase 0 — this page proves the workbench can reach the api over the network.</p>
-      <pre>{JSON.stringify(health, null, 2)}</pre>
+      <h2>Engagements</h2>
+      {engagements.length === 0 ? (
+        <p>No engagements yet.</p>
+      ) : (
+        <table cellPadding={8} style={{ borderCollapse: "collapse", width: "100%" }}>
+          <thead>
+            <tr style={{ textAlign: "left", borderBottom: "1px solid #888" }}>
+              <th>Repo</th>
+              <th>Commit</th>
+              <th>Created</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {engagements.map((e) => (
+              <tr key={e.id} style={{ borderBottom: "1px solid #ccc" }}>
+                <td>{e.repoUrl}</td>
+                <td>{e.commitSha.slice(0, 12)}</td>
+                <td>{new Date(e.createdAt).toLocaleString()}</td>
+                <td>
+                  <Link href={`/engagements/${e.id}`}>view →</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </main>
   );
 }

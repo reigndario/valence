@@ -86,6 +86,16 @@ export async function registerEngagementRoutes(app: FastifyInstance) {
     return toEngagementDTO(row);
   });
 
+  app.get("/engagements", async () => {
+    const rows = await db
+      .selectFrom("engagements")
+      .selectAll()
+      .orderBy("created_at", "desc")
+      .execute();
+
+    return rows.map(toEngagementDTO);
+  });
+
   app.get<{ Params: { id: string } }>("/engagements/:id", async (req, reply) => {
     const row = await db
       .selectFrom("engagements")
