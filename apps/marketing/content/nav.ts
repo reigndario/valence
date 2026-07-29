@@ -46,11 +46,10 @@ export type SocialLink = {
   icon: "github" | "twitter" | "linkedin";
 };
 
-export const socialLinks: SocialLink[] = [
-  { label: "GitHub", href: "https://github.com/valence-labs", icon: "github" },
-  { label: "Twitter", href: "https://twitter.com/valence_labs", icon: "twitter" },
-  { label: "LinkedIn", href: "https://linkedin.com/company/valence-labs", icon: "linkedin" },
-];
+// No real Valence social accounts exist yet. Do not add placeholder URLs here —
+// they can resolve to an unrelated third party's real account. Populate once
+// real accounts exist.
+export const socialLinks: SocialLink[] = [];
 
 export const legalLinks: NavLink[] = [
   { label: "Terms", href: "/terms" },
