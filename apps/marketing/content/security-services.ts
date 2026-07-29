@@ -4,7 +4,12 @@ export const securityServicesIndex: StubContent = {
   eyebrow: "Security Services",
   title: "Human review, backed by the same engine.",
   lede: "Security Audits and Enterprise coverage are staffed by Valence engineers using Artemis, Scout, and Foil as their tooling, not as a replacement for a human reviewer.",
-  note: "This page is a placeholder. Service detail pages are linked from the nav above.",
+  links: [
+    { label: "Security Audits", href: "/security-services/audits" },
+    { label: "Enterprise", href: "/security-services/enterprise" },
+    { label: "Pricing", href: "/security-services/pricing" },
+  ],
+  note: "Full detail pages for each are coming soon.",
 };
 
 export const auditsContent: StubContent = {

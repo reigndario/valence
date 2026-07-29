@@ -1,76 +1,59 @@
 import { describe, expect, it } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Header from "./Header";
 
-describe("Header desktop dropdown", () => {
-  it("opens on ArrowDown and moves focus to the first link", async () => {
-    const user = userEvent.setup();
+describe("Header product tabs", () => {
+  it("renders Artemis, Scout, and Foil as always-visible top-level links", () => {
     render(<Header />);
 
-    const productsButton = screen.getByRole("button", { name: /products/i });
-    act(() => productsButton.focus());
-    await user.keyboard("{ArrowDown}");
-
-    const artemisLink = await screen.findByRole("link", { name: /artemis/i });
-    expect(artemisLink).toHaveFocus();
-  });
-
-  it("moves focus between links with ArrowDown/ArrowUp", async () => {
-    const user = userEvent.setup();
-    render(<Header />);
-
-    const productsButton = screen.getByRole("button", { name: /products/i });
-    act(() => productsButton.focus());
-    await user.keyboard("{ArrowDown}");
-
-    const artemisLink = await screen.findByRole("link", { name: /artemis/i });
-    expect(artemisLink).toHaveFocus();
-
-    await user.keyboard("{ArrowDown}");
-    const scoutLink = screen.getByRole("link", { name: /scout/i });
-    expect(scoutLink).toHaveFocus();
-
-    await user.keyboard("{ArrowUp}");
-    expect(artemisLink).toHaveFocus();
-
-    await user.keyboard("{ArrowUp}");
-    expect(productsButton).toHaveFocus();
-  });
-
-  it("closes on Escape and returns focus to the trigger button", async () => {
-    const user = userEvent.setup();
-    render(<Header />);
-
-    const productsButton = screen.getByRole("button", { name: /products/i });
-    act(() => productsButton.focus());
-    await user.keyboard("{ArrowDown}");
-
-    await screen.findByRole("link", { name: /artemis/i });
-    await user.keyboard("{Escape}");
-
-    expect(screen.queryByRole("link", { name: /artemis/i })).not.toBeInTheDocument();
-    expect(productsButton).toHaveFocus();
+    expect(screen.getByRole("link", { name: "Artemis" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Scout" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Foil" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "$0.99" })).toBeInTheDocument();
   });
 });
 
-describe("Header mobile accordion", () => {
-  it("opens the mobile nav and expands/collapses an accordion item", async () => {
+describe("Header hamburger menu", () => {
+  it("opens the nav menu and expands/collapses the Company accordion", async () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByTestId("mobile-toggle"));
-    expect(screen.getByTestId("mobile-nav")).toBeInTheDocument();
+    expect(screen.queryByTestId("nav-menu")).not.toBeInTheDocument();
 
-    const toggle = screen.getByTestId("mobile-accordion-toggle-0");
+    await user.click(screen.getByTestId("menu-toggle"));
+    expect(screen.getByTestId("nav-menu")).toBeInTheDocument();
+
+    const toggle = screen.getByTestId("menu-accordion-toggle-0");
     expect(toggle).toHaveAttribute("aria-expanded", "false");
 
     await user.click(toggle);
     expect(toggle).toHaveAttribute("aria-expanded", "true");
-    expect(screen.getByTestId("mobile-accordion-panel-0")).toBeInTheDocument();
+    expect(screen.getByTestId("menu-accordion-panel-0")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "About" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Security Services" })).toBeInTheDocument();
 
     await user.click(toggle);
     expect(toggle).toHaveAttribute("aria-expanded", "false");
-    expect(screen.queryByTestId("mobile-accordion-panel-0")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("menu-accordion-panel-0")).not.toBeInTheDocument();
+  });
+
+  it("includes Docs as a plain link in the menu", async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+
+    await user.click(screen.getByTestId("menu-toggle"));
+    expect(screen.getByRole("link", { name: "Docs" })).toBeInTheDocument();
+  });
+
+  it("closes the menu when the toggle is clicked again", async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+
+    await user.click(screen.getByTestId("menu-toggle"));
+    expect(screen.getByTestId("nav-menu")).toBeInTheDocument();
+
+    await user.click(screen.getByTestId("menu-toggle"));
+    expect(screen.queryByTestId("nav-menu")).not.toBeInTheDocument();
   });
 });
