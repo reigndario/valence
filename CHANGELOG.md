@@ -36,6 +36,10 @@ All notable changes to this project are documented here. Format follows
 
 ### Changed
 
+- Renamed the Warden product to **Artemis** across `apps/marketing`, `apps/workbench`,
+  `CLAUDE.md`, and `docs/`. Naming change only — no functional or scope change. Earlier entries
+  in this changelog referring to "Warden" describe the product under its former name and are
+  left as written.
 - `apps/marketing` rebuilt from a single static landing page into a full multi-page site: a
   keyboard-operable header with mega-menu dropdowns (Products, Security Services, Community,
   Company) and a mobile hamburger/accordion overlay, a footer mirroring the nav, and stub pages

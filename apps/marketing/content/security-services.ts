@@ -3,7 +3,7 @@ import type { StubContent } from "./types";
 export const securityServicesIndex: StubContent = {
   eyebrow: "Security Services",
   title: "Human review, backed by the same engine.",
-  lede: "Security Audits and Enterprise coverage are staffed by Valence engineers using Warden, Scout, and Foil as their tooling, not as a replacement for a human reviewer.",
+  lede: "Security Audits and Enterprise coverage are staffed by Valence engineers using Artemis, Scout, and Foil as their tooling, not as a replacement for a human reviewer.",
   note: "This page is a placeholder. Service detail pages are linked from the nav above.",
 };
 
@@ -24,6 +24,6 @@ export const enterpriseContent: StubContent = {
 export const pricingContent: StubContent = {
   eyebrow: "Security Services / Pricing",
   title: "Pricing.",
-  lede: "Pricing depends on scope: lines of code, contract complexity, and whether you need Warden coverage, a full audit, or both.",
+  lede: "Pricing depends on scope: lines of code, contract complexity, and whether you need Artemis coverage, a full audit, or both.",
   note: "Full pricing page is coming soon. Contact us for a quote in the meantime.",
 };

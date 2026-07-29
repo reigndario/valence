@@ -3,7 +3,7 @@ import type { StubContent } from "./types";
 export const blogIndex: StubContent = {
   eyebrow: "Community",
   title: "Blog.",
-  lede: "Notes on formal verification, audit practice, and what we learn running Warden, Scout, and Foil against real protocols.",
+  lede: "Notes on formal verification, audit practice, and what we learn running Artemis, Scout, and Foil against real protocols.",
 };
 
 export const placeholderPost = {

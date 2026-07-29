@@ -49,13 +49,13 @@ export const codeRulePanel = {
         allowanceAfter == allowanceBefore - amount;
 }`,
   },
-  learnMore: { label: "Learn about Warden", href: "/products/warden" },
+  learnMore: { label: "Learn about Artemis", href: "/products/artemis" },
 };
 
 export const featureCallouts = [
   {
     title: "Run on every commit",
-    body: "Warden plugs into CI. Every push re-checks your invariants, not just the commit before an audit.",
+    body: "Artemis plugs into CI. Every push re-checks your invariants, not just the commit before an audit.",
   },
   {
     title: "Find more bugs",
@@ -69,7 +69,7 @@ export const featureCallouts = [
 
 export const comparisonCards = [
   {
-    title: "Warden",
+    title: "Artemis",
     tagline: "Integrate into your process",
     bullets: [
       "Run on every commit",
@@ -77,7 +77,7 @@ export const comparisonCards = [
       "Check every contract path",
       "Verify your contract properties",
     ],
-    cta: { label: "Learn about Warden", href: "/products/warden" },
+    cta: { label: "Learn about Artemis", href: "/products/artemis" },
   },
   {
     title: "Security Audits",

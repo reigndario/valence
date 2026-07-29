@@ -7,6 +7,9 @@ export default async function Home() {
   return (
     <main style={{ fontFamily: "monospace", padding: "2rem" }}>
       <h1>Valence Workbench</h1>
+      <p>
+        <Link href="/triage">Triage queue →</Link>
+      </p>
       <h2>Engagements</h2>
       {engagements.length === 0 ? (
         <p>No engagements yet.</p>

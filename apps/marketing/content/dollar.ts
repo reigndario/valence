@@ -15,9 +15,9 @@ export const dollarContent: DollarContent = {
   title: "The $0.99 audit.",
   price: "$0.99",
   priceUnit: "per contract",
-  lede: "One automated pass over your contract, run by the same Warden and Scout engine behind every Valence engagement, delivered as a written report.",
+  lede: "One automated pass over your contract, run by the same Artemis and Scout engine behind every Valence engagement, delivered as a written report.",
   features: [
-    "Warden runs a bounded formal check across your core invariants",
+    "Artemis runs a bounded formal check across your core invariants",
     "Scout reads the contract, infers intent, and hunts for deviations from it",
     "Every finding is labeled PROVED, VIOLATED, UNKNOWN, or ERROR, never a plain pass",
     "Report delivered by email, typically within minutes of submission",

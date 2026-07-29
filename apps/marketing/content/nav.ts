@@ -13,7 +13,7 @@ export const navGroups: NavGroup[] = [
   {
     label: "Products",
     links: [
-      { label: "Warden", href: "/products/warden", description: "Formal verification for your invariants." },
+      { label: "Artemis", href: "/products/artemis", description: "Formal verification for your invariants." },
       { label: "Scout", href: "/products/scout", description: "An AI agent that infers intent and hunts bugs." },
       { label: "Foil", href: "/products/foil", description: "Mutation testing for your test suite." },
     ],

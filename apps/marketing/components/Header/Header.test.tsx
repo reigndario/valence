@@ -12,8 +12,8 @@ describe("Header desktop dropdown", () => {
     act(() => productsButton.focus());
     await user.keyboard("{ArrowDown}");
 
-    const wardenLink = await screen.findByRole("link", { name: /warden/i });
-    expect(wardenLink).toHaveFocus();
+    const artemisLink = await screen.findByRole("link", { name: /artemis/i });
+    expect(artemisLink).toHaveFocus();
   });
 
   it("moves focus between links with ArrowDown/ArrowUp", async () => {
@@ -24,15 +24,15 @@ describe("Header desktop dropdown", () => {
     act(() => productsButton.focus());
     await user.keyboard("{ArrowDown}");
 
-    const wardenLink = await screen.findByRole("link", { name: /warden/i });
-    expect(wardenLink).toHaveFocus();
+    const artemisLink = await screen.findByRole("link", { name: /artemis/i });
+    expect(artemisLink).toHaveFocus();
 
     await user.keyboard("{ArrowDown}");
     const scoutLink = screen.getByRole("link", { name: /scout/i });
     expect(scoutLink).toHaveFocus();
 
     await user.keyboard("{ArrowUp}");
-    expect(wardenLink).toHaveFocus();
+    expect(artemisLink).toHaveFocus();
 
     await user.keyboard("{ArrowUp}");
     expect(productsButton).toHaveFocus();
@@ -46,10 +46,10 @@ describe("Header desktop dropdown", () => {
     act(() => productsButton.focus());
     await user.keyboard("{ArrowDown}");
 
-    await screen.findByRole("link", { name: /warden/i });
+    await screen.findByRole("link", { name: /artemis/i });
     await user.keyboard("{Escape}");
 
-    expect(screen.queryByRole("link", { name: /warden/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /artemis/i })).not.toBeInTheDocument();
     expect(productsButton).toHaveFocus();
   });
 });
