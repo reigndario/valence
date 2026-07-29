@@ -6,9 +6,7 @@ export default function Hero() {
   return (
     <section className={styles.heroSection}>
       <div className={styles.heroBackground} aria-hidden="true">
-        <svg className={styles.heroRing} viewBox="0 0 800 800" fill="none">
-          <circle cx="400" cy="400" r="380" className={styles.heroRingCircle} strokeWidth="1" />
-        </svg>
+        <div className={styles.heroRing} />
       </div>
 
       <div className={`wrap ${styles.hero}`}>
