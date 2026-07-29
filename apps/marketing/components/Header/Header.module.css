@@ -24,12 +24,109 @@
 }
 
 .logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logoText {
   font-family: var(--font-instrument-serif), Georgia, serif;
   font-weight: 400;
   font-size: 2rem;
-  text-decoration: none;
+  line-height: 1;
   color: var(--logo-color);
-  flex-shrink: 0;
+}
+
+.equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+}
+
+.bar {
+  width: 4px;
+  height: 100%;
+  border-radius: 2px;
+  transform-origin: bottom;
+  animation: eqPulse calc(1s + var(--i) * 0.08s) ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.11s);
+}
+
+.bar:nth-child(1) {
+  background: #7c6fe0;
+}
+
+.bar:nth-child(2) {
+  background: #9271ca;
+}
+
+.bar:nth-child(3) {
+  background: #a873b3;
+}
+
+.bar:nth-child(4) {
+  background: #be759d;
+}
+
+.bar:nth-child(5) {
+  background: #d37686;
+}
+
+.bar:nth-child(6) {
+  background: #e97870;
+}
+
+.bar:nth-child(7) {
+  background: #ff7a59;
+}
+
+@keyframes eqPulse {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  25% {
+    transform: scaleY(0.85);
+  }
+  50% {
+    transform: scaleY(0.45);
+  }
+  75% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes eqPulseHover {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  25% {
+    transform: scaleY(1.05);
+  }
+  50% {
+    transform: scaleY(0.55);
+  }
+  75% {
+    transform: scaleY(1.15);
+  }
+}
+
+.logo:hover .bar,
+.logo:focus-visible .bar {
+  animation-name: eqPulseHover;
+  animation-duration: calc(0.5s + var(--i) * 0.05s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+    transform: scaleY(0.7);
+  }
 }
 
 .desktopNav {

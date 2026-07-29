@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { FocusEvent, KeyboardEvent } from "react";
+import type { CSSProperties, FocusEvent, KeyboardEvent } from "react";
 import Link from "next/link";
 import { navGroups, docsLink, primaryCta, socialLinks } from "../../content/nav";
 import { GithubIcon, TwitterIcon, LinkedinIcon, MenuIcon, CloseIcon, ChevronIcon } from "../icons";
@@ -9,6 +9,8 @@ import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import styles from "./Header.module.css";
 
 const socialIcons = { github: GithubIcon, twitter: TwitterIcon, linkedin: LinkedinIcon };
+
+const equalizerBars = Array.from({ length: 7 });
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -96,7 +98,12 @@ export default function Header() {
     <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ""}`} data-testid="site-header">
       <div className={`wrap ${styles.inner}`}>
         <Link href="/" className={styles.logo} onClick={closeMobile}>
-          Valence
+          <span className={styles.logoText}>Valence</span>
+          <span className={styles.equalizer} aria-hidden="true">
+            {equalizerBars.map((_, i) => (
+              <span key={i} className={styles.bar} style={{ "--i": i } as CSSProperties} />
+            ))}
+          </span>
         </Link>
 
         <nav className={styles.desktopNav} aria-label="Primary">
