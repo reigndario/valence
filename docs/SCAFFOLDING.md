@@ -1,6 +1,6 @@
 # SCAFFOLDING.md
 > Generated: 2026-07-28
-> Doc schema version: **3.1.1** — see [Revision History](#revision-history) and
+> Doc schema version: **3.3.0** — see [Revision History](#revision-history) and
 > [Versioning Standard](#versioning-standard) below.
 > Project: Valence
 > Stack: pnpm monorepo — Next.js 15 (workbench/portal/marketing, Vercel) / Fastify + TS
@@ -8,7 +8,7 @@
 > (Railway) / plain SQL migrations via dbmate / Railway Volume for artifact storage. Infra
 > footprint is deliberately just Railway + Vercel + Docker Desktop locally — no AWS, no
 > Cloudflare, including for Artemis/Scout/Foil artifacts (counterexamples, traces, mutation
-> output, WSL corpora all land on the same Railway Volume).
+> output, Fletch corpora all land on the same Railway Volume).
 > Current state: Phase 0 skeleton and Phase 1 (intake and sandbox) complete and verified.
 > `apps/marketing` (public landing page, jumped the queue ahead of Phase 1) built and
 > verified, not yet deployed. Phase 2 (marketing funnel UI v1) is in progress — P2-08 and
@@ -25,7 +25,9 @@
 | 2.0.0 | 2026-07-28 | **Schema change.** `CLAUDE.md`'s working agreement amended: full task-level checklists now drafted for all phases (0–9) up front, so the whole roadmap is visible and versioned from day one. Added the item-ID scheme and status legend below for enterprise-style cross-referencing (commits/PRs can cite `P4-07`, etc.). Execution discipline is unchanged — one phase worked at a time, later checklists revised as their turn comes. |
 | 3.0.0 | 2026-07-28 | **Structural change**, mirroring `CLAUDE.md`'s product-direction update. Artemis (formal verification), Scout (an AI agent), and Foil (mutation testing) are added as priority phases alongside the existing pre-audit business, inside the existing architecture — no app/package rename. A new **"marketing funnel UI v1"** phase is inserted as **Phase 2** (workbench shell, the full triage-queue interaction set, the self-serve trial flow, and a permanent shareable public report URL), pulling UI ahead of further backend depth on purpose. Phases 2–9 are renumbered to 2–11 to make room; old Phase 7 (LLM review pipeline) is absorbed into new Phase 6 (Scout) — same evidence-gate design, wider job, not a separate track. **Item-ID remapping:** old `P2-*` (analysis battery) → new `P3-*`; old `P3-*` (triage workbench) → folded into new `P2-*`; old `P4-*` (report generation) → unchanged, still `P4-*`; old `P5-*` (client portal) → new `P8-*`; old `P6-*` (property testing) → new `P9-*`; old `P7-*` (LLM review) → folded into new `P6-*` (Scout); old `P8-*` (CI) → new `P10-*`; old `P9-*` (commercial) → new `P11-*`. This remapping is safe under the ID-stability rule below because none of the reassigned items had been started, checked off, or cited in a merged PR — only `P0-*`/`P1-*` carry real history, and those are untouched. |
 | 3.1.0 | 2026-07-29 | **Phase 2 status change** (Next → In Progress) plus resolution of both items' blocking decisions. **P2-08 (workbench auth):** Next.js middleware in `apps/workbench` gates every route behind a shared-secret cookie except an explicit allowlist (`/trial`, `/report/[id]`), which stay open. Chosen over re-enabling Vercel Deployment Protection because that gate is deployment-wide and would also block the public trial/report pages, and over splitting the public surface into a separate app because `CLAUDE.md` calls for `apps/workbench` to stay the single internal surface. **P2-12 (public report default):** no default — every run (trial or engagement) starts private; making a report URL public requires an explicit, logged per-run action. Chosen as the more conservative of the options `CLAUDE.md` raised, given how existential the confidentiality constraint is; this closes the "raise with Sophie" item in `CLAUDE.md`'s decision list. |
-| 3.1.1 | 2026-07-29 | **Rename, no scope/status change.** The Warden product is renamed to **Artemis** throughout `CLAUDE.md`, this file, `docs/BUILD_PLAN.md`, and `apps/marketing`/`apps/workbench` (nav label and route `/products/warden` → `/products/artemis`, page component, content exports, test assertions, the synthetic-findings tool list). `packages/wsl` and the `.wsl` rule-file extension are unaffected — WSL is the rule language's own name, not derived from the product name. `CHANGELOG.md`'s already-written entries are left as historical record of what shipped under the old name; a new entry documents the rename itself. |
+| 3.1.1 | 2026-07-29 | **Rename, no scope/status change.** The Warden product is renamed to **Artemis** throughout `CLAUDE.md`, this file, `docs/BUILD_PLAN.md`, and `apps/marketing`/`apps/workbench` (nav label and route `/products/warden` → `/products/artemis`, page component, content exports, test assertions, the synthetic-findings tool list). `packages/fletch` and the `.fletch` rule-file extension are unaffected — Fletch is the rule language's own name, not derived from the product name. `CHANGELOG.md`'s already-written entries are left as historical record of what shipped under the old name; a new entry documents the rename itself. |
+| 3.2.0 | 2026-07-30 | **Blocking-decision resolution.** The Artemis engine decision (`P5-01`) is resolved: Artemis orchestrates existing open-source engines — Halmos, Kontrol (Runtime Verification), hevm, and SMTChecker — behind a from-scratch Fletch compiler/IR and harness layer. This is Option A, expanded with Kontrol as a fourth engine; Option B (fork the Certora Prover) is ruled out over GPLv3 copyleft risk, and Option C (custom verification-condition generator) is ruled out in favor of dispatching to existing engines. `P5-01` is unblocked and Phase 5 can proceed. Separately, Scout's agent design is confirmed as based on Kritt AI (informs `packages/scout-agent`, `P6-06`, no blocking item attached). Foil is unchanged. Full reasoning mirrored in `CLAUDE.md`'s new "Decisions made" section and `docs/BUILD_PLAN.md`. |
+| 3.3.0 | 2026-07-31 | **Stale-doc sync, no scope change.** Two corrections carried over from `docs/RESEARCH.md`'s recovered session record, which had flagged both at the time but never propagated them into the live docs: (1) **Rename** — the spec language, previously WSL, is renamed **Fletch** (`packages/wsl` → `packages/fletch`, `.wsl` → `.fletch`) throughout this file, `CLAUDE.md`, `docs/BUILD_PLAN.md`, and `apps/marketing/content/home.ts`'s illustrative rule panel. Reason: WSL collided with the far more common "Windows Subsystem for Linux." (2) **Phase-order correction** — `docs/BUILD_PLAN.md`'s 2026-07-29 "Foil next" decision is superseded; see that file's decisions log for the new entry. Foil (Phase 7) structurally depends on Artemis (Phase 5) — Foil mutates against the rule suite Artemis executes — so it was never actually buildable before Artemis regardless of which one had an open blocking decision at the time. `docs/RESEARCH.md` §6 already recorded this as Sophie's call immediately after the engine decision resolved; this entry is the sync, not a new decision. |
 
 ---
 
@@ -107,7 +109,7 @@ not inferred from code.
 | `apps/api` product routes | 🔧 Partial | Engagement intake (`POST`/`GET /engagements`, `GET /engagements/:id`), SSE log streaming (`GET /engagements/:id/logs`), and run listing (`GET /engagements/:id/runs`, backed by the new `runs` table) done; auth, orgs, findings still to come |
 | `packages/findings`, `packages/report` | ⏸ Not Started | Phase 3 (`findings`), Phase 4 (`report`) |
 | `packages/sdk`, `packages/cli` | ⏸ Not Started | Not yet scheduled to a specific phase |
-| `packages/wsl`, `packages/wsl-compiler`, `packages/trace` | ⏸ Not Started | Phase 5 (Artemis) |
+| `packages/fletch`, `packages/fletch-compiler`, `packages/trace` | ⏸ Not Started | Phase 5 (Artemis) |
 | `packages/scout-agent` | ⏸ Not Started | Phase 6 (Scout) |
 | `packages/foil` | ⏸ Not Started | Phase 7 (Foil) |
 | `workers/orchestrator` | ✅ Done | BullMQ consumer + the full Phase 1 sandbox pipeline (clone, hardened build, determinism check, artifact persistence) |
@@ -389,27 +391,27 @@ paying client.
 
 ## Phase 5: Artemis v1 — ⏸ Not Started
 
-**Goal:** Compile WSL to a verification IR, emit an engine harness, dispatch to the chosen
+**Goal:** Compile Fletch to a verification IR, emit an engine harness, dispatch to the chosen
 verification engine, return the four-state result (`PROVED`/`VIOLATED`/`UNKNOWN`/`ERROR`) with
 a counterexample and call trace.
 **Depends on:** Phase 1 (sandbox) and Phase 2 (UI + report URL to surface results in) complete.
-**Estimated scope:** Large — new spec language, compiler, and engine-integration surface; the
-engine decision below has to be resolved before most of this phase can start.
+**Estimated scope:** Large — new spec language, compiler, and engine-integration surface.
 **Acceptance test:** a correct ERC20 proves; a deliberately broken `transferFrom` returns
 `VIOLATED` with a correct call trace; an unbounded loop returns `UNKNOWN` with a stated reason.
 
 ### Checklist
 
-- [ ] **P5-01** ⛔ Resolve the engine decision with Sophie (Option A: orchestrate open-source
-      engines — Halmos, hevm, SMTChecker; Option B: fork the Certora Prover, GPLv3 copyleft
-      risk; Option C: build a VC generator + solver-portfolio dispatch) — blocks every other
-      item in this phase, see `CLAUDE.md`'s Artemis section for full tradeoffs
-- [ ] **P5-02** Build `packages/wsl`: lexer, parser, AST
-- [ ] **P5-03** Build the WSL typechecker against contract ABIs
-- [ ] **P5-04** Build the WSL formatter (must be idempotent)
-- [ ] **P5-05** Write the ERC20/ERC4626/basic-access-control WSL corpus as the language's
+- [x] **P5-01** Engine decision resolved with Sophie: orchestrate open-source engines —
+      Halmos, Kontrol (Runtime Verification), hevm, and SMTChecker — behind a from-scratch Fletch
+      compiler/IR and harness layer. Not a Certora Prover fork (GPLv3 copyleft risk ruled it
+      out) and not a custom VC generator. See `CLAUDE.md`'s "Decisions made" section and this
+      file's v3.2.0 revision-history entry for full reasoning.
+- [ ] **P5-02** Build `packages/fletch`: lexer, parser, AST
+- [ ] **P5-03** Build the Fletch typechecker against contract ABIs
+- [ ] **P5-04** Build the Fletch formatter (must be idempotent)
+- [ ] **P5-05** Write the ERC20/ERC4626/basic-access-control Fletch corpus as the language's
       proving ground
-- [ ] **P5-06** Build `packages/wsl-compiler`: WSL AST → verification IR
+- [ ] **P5-06** Build `packages/fletch-compiler`: Fletch AST → verification IR
 - [ ] **P5-07** Build the verification-IR → engine-harness emission for the chosen engine
       (P5-01)
 - [ ] **P5-08** Stand up `workers/engines` (Python) with the chosen engine adapter, uniform
@@ -433,7 +435,7 @@ engine decision below has to be resolved before most of this phase can start.
 
 ## Phase 6: Scout v1 — ⏸ Not Started
 
-**Goal:** Intent inference from code and docs, WSL rule generation from that intent (dispatched
+**Goal:** Intent inference from code and docs, Fletch rule generation from that intent (dispatched
 through Artemis), a separate bug-hunting pass, a retry-on-failure loop, a three-part report.
 Absorbs what was previously scoped as the standalone "LLM review pipeline" — same evidence-gate
 principle, wider job, not a separate track.
@@ -457,9 +459,10 @@ it demonstrably retries with a revised approach before surfacing the failure.
 - [ ] **P6-04** Build the retrieval layer against the corpus
 - [ ] **P6-05** Build chunking by contract and function with call-graph neighbors, not by token
       window
-- [ ] **P6-06** Build `packages/scout-agent`: intent inference from code and docs
-- [ ] **P6-07** Build WSL rule generation from inferred intent, dispatched through
-      `packages/wsl-compiler` — every generated rule gets the same four-state treatment as a
+- [ ] **P6-06** Build `packages/scout-agent`: intent inference from code and docs (agent design
+      based on Kritt AI, per `CLAUDE.md`'s "Decisions made" section)
+- [ ] **P6-07** Build Fletch rule generation from inferred intent, dispatched through
+      `packages/fletch-compiler` — every generated rule gets the same four-state treatment as a
       human-written one
 - [ ] **P6-08** Build the separate bug-hunting pass: structured proposal generation
       (vulnerability class, file/line span, preconditions, impact, proposed Foundry test)
@@ -487,9 +490,9 @@ it demonstrably retries with a revised approach before surfacing the failure.
 
 ## Phase 7: Foil v1 — ⏸ Not Started
 
-**Goal:** Mutant generation over the source, a campaign runner against the WSL rule suite, a
+**Goal:** Mutant generation over the source, a campaign runner against the Fletch rule suite, a
 survivor report, and a mutation-score dashboard in the workbench.
-**Depends on:** Phase 5 (Artemis) complete — Foil mutates against the WSL rule suite Artemis
+**Depends on:** Phase 5 (Artemis) complete — Foil mutates against the Fletch rule suite Artemis
 executes.
 **Estimated scope:** Medium-large.
 **Acceptance test:** a vacuous spec is flagged by a surviving mutant that names the exact hole.
@@ -497,7 +500,7 @@ executes.
 ### Checklist
 
 - [ ] **P7-01** Build `packages/foil`: semantic mutant generator over Solidity source
-- [ ] **P7-02** Build the campaign runner: rerun the WSL rule suite (via Artemis) against each
+- [ ] **P7-02** Build the campaign runner: rerun the Fletch rule suite (via Artemis) against each
       mutant
 - [ ] **P7-03** Implement survivor detection: a mutant that survives means no rule caught it
 - [ ] **P7-04** Build the survivor report, naming the exact hole (which rule or code path went
@@ -545,7 +548,7 @@ a delta report.
 
 **Goal:** Invariant inventory as a first-class object. ABI-driven handler generation, Medusa or
 Echidna campaigns, halmos standard property sets — complementary to Phase 5's Artemis proofs
-rather than duplicating them: fuzzing catches what an unbounded WSL rule can't afford to check
+rather than duplicating them: fuzzing catches what an unbounded Fletch rule can't afford to check
 exhaustively, and vice versa.
 **Depends on:** Phase 3 complete (needs the finding/contract model); can run in parallel with
 Phases 4–8 if useful, but not started before Phase 3's acceptance test passes.
@@ -629,9 +632,7 @@ quota enforcement works end to end.
 Tracked so they don't get decided by default inertia. Full list with phase mapping in
 [`docs/BUILD_PLAN.md`](./BUILD_PLAN.md#pending-decisions-blocking-future-phases):
 
-- The Artemis engine decision — Option A (orchestrate open-source engines) vs. B (fork Certora
-  Prover, GPLv3) vs. C (build a VC generator + solver portfolio) (blocks **P5-01**)
-- Whether WSL aims for source compatibility with CVL — helps adoption, real legal/design
+- Whether Fletch aims for source compatibility with CVL — helps adoption, real legal/design
   constraint to weigh first (blocks the detailed design of **P5-02**–**P5-04**)
 - Whether Scout's model calls run through a hosted provider or something self-hostable for
   enterprise clients (blocks **P6-02**)

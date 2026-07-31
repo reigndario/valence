@@ -3,9 +3,13 @@
 Valence is a Web3 security firm that sells pre-audits: the engagement a protocol runs in the
 weeks before a paid audit with a top-tier firm, or instead of one when they can't afford it.
 Artemis (formal verification), Scout (an AI agent that infers intent, writes rules for it, and
-separately hunts bugs), and Foil (mutation testing) are the automated engine layer — same shape
-as Certora's Prover/AutoProver/Gambit, EVM-only for v1. Sophie works with VS Code, Foundry,
-Vercel, and Railway. Solidity, Python, TypeScript. Assume crypto and DeFi fluency.
+separately hunts bugs), and Foil (mutation testing) are the automated engine layer — same
+product shape as Certora's Prover/AutoProver/Gambit, EVM-only for v1, but not derived from
+Certora's code. Artemis orchestrates existing open-source engines — Halmos, Kontrol (Runtime
+Verification), hevm, and SMTChecker — behind a from-scratch Fletch compiler and harness layer; it
+is not a Certora Prover fork. Scout's agent design is based on Kritt AI. Sophie works with
+VS Code, Foundry, Vercel, and Railway. Solidity, Python, TypeScript. Assume crypto and DeFi
+fluency.
 
 Full business context, architecture, and the phase-by-phase build plan are versioned in
 `docs/SCAFFOLDING.md` — this file stays short and points there rather than duplicating it.
@@ -37,14 +41,14 @@ border/shadow after ~60px scroll.
 
 **Home page order:** hero (headline + two CTAs, text-only) → tooling strip (Foundry, Slither,
 Halmos, Z3 — real pipeline tools, not client logos, since there are no named clients yet) →
-code/rule panel (real compiling Solidity `transferFrom` next to the WSL check for it) →
+code/rule panel (real compiling Solidity `transferFrom` next to the Fletch check for it) →
 three feature callouts → two comparison cards (Artemis / Security Audits) → footer.
 
 **Content rules:** no invented clients, testimonials, logos, or certifications. No exclamation
 marks, "revolutionize," "cutting-edge," or em dashes. All copy in typed objects under
 `apps/marketing/content/`, one file per page, nothing hardcoded in JSX.
 
-**WSL caveat:** `packages/wsl` has no finalized grammar yet (that's Phase 5, not started). The
+**Fletch caveat:** `packages/fletch` has no finalized grammar yet (that's Phase 5, not started). The
 code/rule panel is illustrative marketing copy, not a real compiled artifact or run result — no
 live status badge, no green "PROVED" checkmark, since nothing actually ran. This is the
 rule-status-honesty principle (below) applied to marketing copy.
@@ -56,6 +60,19 @@ to this package.
 **Stub-only pages** (header/footer wired, minimal content): Artemis, Scout, Foil, Security
 Services index (links to Audits, Enterprise, Pricing), Audits, Enterprise, Pricing, About, Docs,
 Contact, Terms, Privacy.
+
+## Decisions made
+
+- **Artemis engine architecture** (resolved): orchestrates Halmos, Kontrol (Runtime
+  Verification), hevm, and SMTChecker as the underlying verification engines, behind a
+  from-scratch Fletch compiler/IR and harness layer. Not a Certora Prover fork — ruled out over
+  GPLv3 copyleft risk — and not a custom verification-condition generator either. Unblocks
+  Phase 5 (`P5-01`); full detail in `docs/SCAFFOLDING.md`'s revision history.
+- **Scout's agent design** (resolved): based on Kritt AI.
+- **Foil**: unchanged from the original mutation-testing scope.
+- **Spec language naming** (resolved 2026-07-31): the spec language (formerly **WSL**) is
+  renamed **Fletch** — WSL collided with the far more common "Windows Subsystem for Linux."
+  `packages/wsl` → `packages/fletch`, `.wsl` → `.fletch`. No scope change.
 
 ## Hard constraints (do not relax without Sophie's sign-off)
 
@@ -77,8 +94,11 @@ Contact, Terms, Privacy.
 ## Working agreement
 
 - Read this file before writing code; check `docs/SCAFFOLDING.md` before resuming phase work.
-- Before any expensive-to-reverse decision (schema shape, finding model, sandbox strategy, the
-  Artemis engine choice), stop and give Sophie two or three options with tradeoffs, then wait.
+- Before any expensive-to-reverse decision (schema shape, finding model, sandbox strategy,
+  Scout's hosted-vs-self-hostable model provider), stop and give Sophie two or three options
+  with tradeoffs, then wait. The Artemis engine choice was this kind of decision and is now
+  resolved (see below) — treat it as settled, not open for re-litigation without Sophie
+  reopening it.
 - Prefer fewer dependencies and less new infrastructure when the choice is close.
 - Never fabricate a finding, a severity, or a tool result. Unimplemented stages return
   `NOT_IMPLEMENTED`, never an empty pass.
