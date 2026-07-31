@@ -1,12 +1,12 @@
 # BUILD_PLAN.md
 > Project: Valence
-> Last updated: 2026-07-29
+> Last updated: 2026-07-31
 
 Master phase-by-phase status tracker. The full description of each phase — what it delivers,
 its acceptance test — lives in [`CLAUDE.md`](../CLAUDE.md#phase-plan) and is not duplicated
 here beyond a one-line summary. Full task-level checklists for every phase (0–11), with stable
 `P{phase}-{seq}` item IDs for cross-referencing in commits/PRs, live in
-[`docs/SCAFFOLDING.md`](./SCAFFOLDING.md) (schema v3.0.0 — see its own versioning standard).
+[`docs/SCAFFOLDING.md`](./SCAFFOLDING.md) (schema v3.2.0 — see its own versioning standard).
 This file exists to answer "what's done, what's next, what's blocked" at a glance. Per the
 working agreement: **one phase worked at a time — later phases' checklists exist and are
 versioned from day one, but no code is written against a future phase before the current one's
@@ -149,21 +149,45 @@ for the full reasoning:
   goes directly to **Phase 7 (Foil v1)** next, ahead of Phase 3 (analysis battery) and Phase 4
   (report generation). Reasoning: with `apps/marketing` now shipped, the stated priority is the
   three product engines — Artemis, Scout, Foil — not further generic pipeline/report
-  infrastructure. Foil is the only one of the three with no open blocking decision (Artemis
-  needs the engine-architecture call; Scout needs the hosted-LLM/provider-terms call), so it's
-  the fastest path to a real shipped product. Phase 3 and 4 are deferred, not cancelled — they
-  pick back up once a product engine exists to feed them real findings. Phase 2 itself is not
-  paused; its remaining items (P2-03–14) still get finished first, per the working agreement's
-  one-phase-at-a-time rule.
+  infrastructure. Foil is the only one of the three with no open blocking decision (at the time,
+  Artemis needed the engine-architecture call and Scout needed the hosted-LLM/provider-terms
+  call), so it's the fastest path to a real shipped product. Phase 3 and 4 are deferred, not
+  cancelled — they pick back up once a product engine exists to feed them real findings.
+  Phase 2 itself is not paused; its remaining items (P2-03–14) still get finished first, per
+  the working agreement's one-phase-at-a-time rule.
+- **The Artemis engine decision** (2026-07-30): resolved as orchestrate open-source engines —
+  Halmos, Kontrol (Runtime Verification), hevm, and SMTChecker — behind a from-scratch Fletch
+  compiler/IR and harness layer, not a fork of the Certora Prover (GPLv3 copyleft risk) and not
+  a custom verification-condition generator. Unblocks Phase 5's `P5-01`. Separately, Scout's
+  agent design is confirmed as based on Kritt AI; Foil is unchanged. Full reasoning in
+  `CLAUDE.md`'s "Decisions made" section and `docs/SCAFFOLDING.md`'s v3.2.0 revision-history
+  entry.
+- **Phase-order correction, superseding "Phase order after Phase 2" above** (2026-07-31): once
+  Phase 2 passes its acceptance test, the next phase is **Phase 5 (Artemis)**, not Phase 7
+  (Foil). The 2026-07-29 entry above picked Foil specifically because, at the time, it was the
+  only one of the three product engines with no open blocking decision. That premise stopped
+  holding the very next day, when the Artemis engine decision resolved — but the phase-order
+  call was never revisited. Separately, and independent of that premise: Foil structurally
+  cannot come before Artemis regardless of blocking-decision status, since Foil's own stated
+  dependency is "Phase 5 (Artemis) complete — Foil mutates against the rule suite Artemis
+  executes" (see `docs/SCAFFOLDING.md` Phase 7). This correction isn't a new call — it's a sync.
+  `docs/RESEARCH.md` §6 already recorded it as Sophie's conclusion immediately after the engine
+  decision resolved on 2026-07-30; it just never made it into this file until now. Phase 2 is
+  still not paused and still must pass its acceptance test first, per the working agreement's
+  one-phase-at-a-time rule — this only fixes what comes *after* Phase 2, not the phase currently
+  in progress.
+- **Fletch rename** (2026-07-31): the spec language, previously **WSL**, is renamed **Fletch**
+  (`packages/wsl` → `packages/fletch`, `.wsl` → `.fletch`) across `CLAUDE.md`,
+  `docs/SCAFFOLDING.md` (bumped to v3.3.0), this file, and `apps/marketing/content/home.ts`'s
+  illustrative rule panel. Reason: WSL collided with "Windows Subsystem for Linux," a far more
+  common meaning of the acronym in any developer-facing context. No scope change to the language
+  or compiler design.
 
 ## Pending decisions (blocking future phases)
 
 Carried from CLAUDE.md's "Things to raise with Sophie" — listed here against the phase each one
 blocks, so the right one gets raised at the right time instead of all at once:
 
-- **The Artemis engine decision** (orchestrate open-source engines vs. fork Certora's Prover
-  vs. build a verification-condition generator + solver portfolio) — blocks Phase 5, the
-  single biggest architecture call in the new product line.
 - **Whether first paying engagements run by hand while the workbench is built** — affects
   phase ordering. Didn't block Phase 1's code and is still open; worth resolving before Phase
   2/3 prioritization decisions get made by default inertia.

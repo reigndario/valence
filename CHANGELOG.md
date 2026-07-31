@@ -36,6 +36,12 @@ All notable changes to this project are documented here. Format follows
 
 ### Changed
 
+- Renamed the spec language from **WSL** to **Fletch** (`packages/wsl` → `packages/fletch`,
+  `.wsl` → `.fletch`) across `CLAUDE.md`, `docs/SCAFFOLDING.md`, `docs/BUILD_PLAN.md`, and
+  `apps/marketing/content/home.ts`'s illustrative rule panel. WSL collided with "Windows
+  Subsystem for Linux." No functional or scope change. Separately, corrected a stale phase-order
+  decision in `docs/BUILD_PLAN.md`: Phase 5 (Artemis) is next after Phase 2, not Phase 7 (Foil)
+  — Foil depends on Artemis's rule suite existing, so it was never actually buildable first.
 - Renamed the Warden product to **Artemis** across `apps/marketing`, `apps/workbench`,
   `CLAUDE.md`, and `docs/`. Naming change only — no functional or scope change. Earlier entries
   in this changelog referring to "Warden" describe the product under its former name and are
@@ -46,7 +52,7 @@ All notable changes to this project are documented here. Format follows
   for every nav route (Warden/Scout/Foil, Audits/Enterprise/Pricing, Blog, About, Docs, Contact,
   Terms, Privacy). Home page now runs hero → tooling strip (Foundry/Slither/Halmos/Z3, no
   invented client logos) → a two-pane code/rule panel (a real compiling `transferFrom` beside
-  illustrative WSL, no live status badge since nothing actually ran) → three feature callouts →
+  illustrative Fletch, no live status badge since nothing actually ran) → three feature callouts →
   two comparison cards. Palette replaced with Valence's warm pastel scheme
   (`apps/marketing/app/globals.css`); all copy moved into typed objects under
   `apps/marketing/content/`. Adds a package-scoped `vitest` + `@testing-library/react` setup

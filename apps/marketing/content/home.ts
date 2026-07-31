@@ -34,7 +34,7 @@ export const codeRulePanel = {
 }`,
   },
   rule: {
-    filename: "Token.wsl",
+    filename: "Token.fletch",
     source: `rule allowanceDecreasesAfterTransferFrom {
     env e;
     address from; address to; uint256 amount;
